@@ -64,6 +64,13 @@ class ScriptCommanderApp(ctk.CTk):
         self.view_title = ctk.CTkLabel(self.header, text="My Scripts", font=ctk.CTkFont(size=28, weight="bold"))
         self.view_title.pack(side="left")
 
+        # Search Bar
+        self.search_var = ctk.StringVar()
+        self.search_var.trace_add("write", lambda *args: self.filter_scripts())
+        self.search_entry = ctk.CTkEntry(self.header, placeholder_text="Search scripts...", 
+                                        textvariable=self.search_var, width=250)
+        self.search_entry.pack(side="right", padx=10)
+
         self.refresh_btn = ctk.CTkButton(self.header, text="Refresh", width=100, fg_color=ACCENT_COLOR, command=self.load_scripts)
         self.refresh_btn.pack(side="right")
 
@@ -87,15 +94,21 @@ class ScriptCommanderApp(ctk.CTk):
         btn.pack(fill="x", padx=10, pady=5)
         return btn
 
+    def filter_scripts(self):
+        query = self.search_var.get().lower()
+        if self.view_title.cget("text") == "My Scripts":
+            self.load_scripts(query)
+        elif "Marketplace" in self.view_title.cget("text"):
+            self.show_marketplace(query)
+
     def show_local_scripts(self):
         self.view_title.configure(text="My Scripts")
         self.load_scripts()
 
-    def show_marketplace(self):
+    def show_marketplace(self, query=""):
         self.view_title.configure(text="Official Marketplace")
         self.clear_view()
         
-        # Security Header
         sec_frame = ctk.CTkFrame(self.scroll_frame, fg_color="#064e3b", corner_radius=8)
         sec_frame.pack(fill="x", pady=(0, 15), padx=5)
         sec_lbl = ctk.CTkLabel(sec_frame, text="🛡️ All scripts in this marketplace have been manually audited for security.", 
@@ -109,6 +122,8 @@ class ScriptCommanderApp(ctk.CTk):
                 response = requests.get(MARKETPLACE_URL, timeout=10)
                 response.raise_for_status()
                 items = response.json()
+                if query:
+                    items = [i for i in items if query in i["name"].lower() or query in i["description"].lower()]
                 self.after(0, lambda: self.render_marketplace(items))
             except Exception as e:
                 self.after(0, lambda: self.show_error(f"Marketplace Error: {e}"))
@@ -134,7 +149,6 @@ class ScriptCommanderApp(ctk.CTk):
         info = ctk.CTkFrame(card, fg_color="transparent")
         info.pack(side="left", padx=20, pady=15, fill="both", expand=True)
         
-        # Name + Verified Badge
         header_frame = ctk.CTkFrame(info, fg_color="transparent")
         header_frame.pack(fill="x")
         
@@ -150,8 +164,6 @@ class ScriptCommanderApp(ctk.CTk):
         lbl_desc.pack(fill="x")
 
         is_installed = os.path.exists(os.path.join(SCRIPTS_DIR, f"{item['id']}.ps1"))
-        # ... (keep existing button logic)
-
         btn_text = "Installed" if is_installed else "Download"
         btn_state = "disabled" if is_installed else "normal"
         btn_color = "gray" if is_installed else ACCENT_COLOR
@@ -200,7 +212,6 @@ class ScriptCommanderApp(ctk.CTk):
         lbl_path = ctk.CTkLabel(container, text=f"Scripts Directory:\n{SCRIPTS_DIR}", justify="left", text_color="gray")
         lbl_path.pack(pady=10, anchor="w")
 
-        # Marketplace Submission
         ctk.CTkLabel(container, text="Developer Portal", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(30, 10), anchor="w")
         
         btn_submit = ctk.CTkButton(container, text="Submit Tool to Marketplace", fg_color=ACCENT_COLOR,
@@ -210,7 +221,6 @@ class ScriptCommanderApp(ctk.CTk):
         ctk.CTkLabel(container, text="All submissions undergo manual security review before appearing in the marketplace.", 
                      font=ctk.CTkFont(size=11), text_color="gray").pack(anchor="w")
 
-        # App Updates
         ctk.CTkLabel(container, text="Application Updates", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(30, 10), anchor="w")
         
         btn_update = ctk.CTkButton(container, text="Check for Updates", fg_color="#475569",
@@ -222,7 +232,6 @@ class ScriptCommanderApp(ctk.CTk):
         
         def run_git_pull():
             try:
-                # Check if it's a git repo
                 result = subprocess.run(["git", "pull", "origin", "main"], capture_output=True, text=True, check=True)
                 if "Already up to date" in result.stdout:
                     self.after(0, lambda: messagebox.showinfo("Update", "Script Commander is already up to date!"))
@@ -230,7 +239,7 @@ class ScriptCommanderApp(ctk.CTk):
                     self.after(0, lambda: messagebox.showinfo("Update", "Updates downloaded! Please restart the application to apply changes."))
                 self.after(0, lambda: self.status_label.configure(text="Update check complete.", text_color="gray"))
             except Exception as e:
-                self.after(0, lambda: messagebox.showerror("Update Error", f"Failed to update via Git: {e}\n\nPlease ensure Git is installed and you are in the repository folder."))
+                self.after(0, lambda: messagebox.showerror("Update Error", f"Failed to update via Git: {e}"))
                 self.after(0, lambda: self.status_label.configure(text="Update failed.", text_color="red"))
 
         threading.Thread(target=run_git_pull, daemon=True).start()
@@ -239,19 +248,21 @@ class ScriptCommanderApp(ctk.CTk):
         for widget in self.scroll_frame.winfo_children():
             widget.destroy()
 
-    def load_scripts(self):
+    def load_scripts(self, query=""):
         self.clear_view()
         if not os.path.exists(SCRIPTS_DIR):
             os.makedirs(SCRIPTS_DIR)
 
         files = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".ps1") or f.endswith(".py")]
+        filtered_files = [f for f in files if query in f.lower()]
         
-        if not files:
-            lbl = ctk.CTkLabel(self.scroll_frame, text="No scripts found. Visit the Marketplace to download some!", text_color="gray")
+        if not filtered_files:
+            msg = "No scripts found." if not query else f"No scripts matching '{query}'"
+            lbl = ctk.CTkLabel(self.scroll_frame, text=msg, text_color="gray")
             lbl.pack(pady=50)
             return
 
-        for script_file in files:
+        for script_file in filtered_files:
             self.create_script_card(script_file)
 
     def create_script_card(self, filename):
