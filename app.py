@@ -127,13 +127,24 @@ class ScriptCommanderApp(ctk.CTk):
         info = ctk.CTkFrame(card, fg_color="transparent")
         info.pack(side="left", padx=20, pady=15, fill="both", expand=True)
         
-        lbl_name = ctk.CTkLabel(info, text=item["name"], font=ctk.CTkFont(size=16, weight="bold"), anchor="w")
-        lbl_name.pack(fill="x")
+        # Name + Verified Badge
+        header_frame = ctk.CTkFrame(info, fg_color="transparent")
+        header_frame.pack(fill="x")
+        
+        lbl_name = ctk.CTkLabel(header_frame, text=item["name"], font=ctk.CTkFont(size=16, weight="bold"), anchor="w")
+        lbl_name.pack(side="left")
+        
+        if item.get("verified", False):
+            badge = ctk.CTkLabel(header_frame, text="✓ VERIFIED", font=ctk.CTkFont(size=9, weight="bold"), 
+                                 text_color=SUCCESS_COLOR, fg_color="#064e3b", corner_radius=4)
+            badge.pack(side="left", padx=10)
         
         lbl_desc = ctk.CTkLabel(info, text=item["description"], font=ctk.CTkFont(size=12), text_color="gray", anchor="w", wraplength=400)
         lbl_desc.pack(fill="x")
 
         is_installed = os.path.exists(os.path.join(SCRIPTS_DIR, f"{item['id']}.ps1"))
+        # ... (keep existing button logic)
+
         btn_text = "Installed" if is_installed else "Download"
         btn_state = "disabled" if is_installed else "normal"
         btn_color = "gray" if is_installed else ACCENT_COLOR
@@ -172,8 +183,25 @@ class ScriptCommanderApp(ctk.CTk):
     def show_settings(self):
         self.view_title.configure(text="Settings")
         self.clear_view()
-        lbl = ctk.CTkLabel(self.scroll_frame, text=f"{APP_NAME}\nVersion {VERSION}\n\nScripts Directory:\n{SCRIPTS_DIR}", justify="left")
-        lbl.pack(pady=20, padx=20)
+        
+        container = ctk.CTkFrame(self.scroll_frame, fg_color="transparent")
+        container.pack(pady=20, padx=20, fill="both", expand=True)
+
+        lbl = ctk.CTkLabel(container, text=f"{APP_NAME} v{VERSION}", font=ctk.CTkFont(size=20, weight="bold"))
+        lbl.pack(pady=(0, 10), anchor="w")
+        
+        lbl_path = ctk.CTkLabel(container, text=f"Scripts Directory:\n{SCRIPTS_DIR}", justify="left", text_color="gray")
+        lbl_path.pack(pady=10, anchor="w")
+
+        # Marketplace Submission
+        ctk.CTkLabel(container, text="Developer Portal", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(30, 10), anchor="w")
+        
+        btn_submit = ctk.CTkButton(container, text="Submit Tool to Marketplace", fg_color=ACCENT_COLOR,
+                                  command=lambda: subprocess.run(["explorer", "https://github.com/torresjchristopher/ScriptCommander-Scripts/issues/new"]))
+        btn_submit.pack(pady=5, anchor="w")
+        
+        ctk.CTkLabel(container, text="All submissions undergo manual security review before appearing in the marketplace.", 
+                     font=ctk.CTkFont(size=11), text_color="gray").pack(anchor="w")
 
     def clear_view(self):
         for widget in self.scroll_frame.winfo_children():
