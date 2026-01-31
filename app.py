@@ -92,10 +92,17 @@ class ScriptCommanderApp(ctk.CTk):
         self.load_scripts()
 
     def show_marketplace(self):
-        self.view_title.configure(text="Marketplace")
+        self.view_title.configure(text="Official Marketplace")
         self.clear_view()
         
-        self.status_label.configure(text="Fetching marketplace scripts...", text_color=ACCENT_COLOR)
+        # Security Header
+        sec_frame = ctk.CTkFrame(self.scroll_frame, fg_color="#064e3b", corner_radius=8)
+        sec_frame.pack(fill="x", pady=(0, 15), padx=5)
+        sec_lbl = ctk.CTkLabel(sec_frame, text="🛡️ All scripts in this marketplace have been manually audited for security.", 
+                               font=ctk.CTkFont(size=11, weight="bold"), text_color=SUCCESS_COLOR)
+        sec_lbl.pack(pady=8)
+
+        self.status_label.configure(text="Fetching verified scripts...", text_color=ACCENT_COLOR)
         
         def fetch_market():
             try:

@@ -17,6 +17,10 @@
 - `pillow`: Advanced image and icon rendering.
 - `markdown-pdf`: High-fidelity document conversion.
 
-## GitHub Repositories
-- **Source Code**: [ScriptCommander-Source](https://github.com/torresjchristopher/ScriptCommander-Source)
-- **Official Scripts**: [ScriptCommander-Marketplace](https://github.com/torresjchristopher/ScriptCommander-Scripts)
+## Marketplace Security & Quarantine
+Script Commander employs a "Human-in-the-Loop" security model to prevent malicious software distribution:
+
+1.  **Quarantine Layer**: Submissions are directed to GitHub Issues/Pull Requests. In this state, the code is "Quarantined"—it is not indexed by the application and cannot be downloaded by users.
+2.  **Manual Audit**: Every submission undergoes a line-by-line code review by the administrator to ensure no malicious system calls, network exfiltration, or obfuscated logic exists.
+3.  **Official Promotion**: Only audited scripts are added to the `marketplace.json` manifest in the production branch.
+4.  **Integrity Check**: The application validates the source URL against the official `torresjchristopher` namespace.
