@@ -1,0 +1,4 @@
+customtkinter
+packaging
+markdown-pdf
+pymupdf

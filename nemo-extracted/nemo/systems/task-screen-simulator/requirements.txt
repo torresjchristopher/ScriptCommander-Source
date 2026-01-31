@@ -1,0 +1,8 @@
+click==8.1.7
+rich==13.7.0
+pyttsx3==2.90  # Local TTS engine (offline)
+google-cloud-texttospeech==2.14.0  # Google Cloud TTS (online)
+pynput==1.7.6  # Keyboard input capture
+psutil==5.9.6  # Process/memory monitoring
+pyaudio==0.2.13  # Microphone input (optional, for live recording)
+google-cloud-speech==2.21.0  # Speech-to-text API (optional)
