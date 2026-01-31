@@ -12,9 +12,7 @@ from tkinter import messagebox
 APP_NAME = "Script Commander"
 VERSION = "2.0.0"
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
-METADATA_FILE = os.path.join(SCRIPTS_DIR, "metadata.json")
-# Official Marketplace URL
-MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json" 
+MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json"
 
 # Colors & Style
 ACCENT_COLOR = "#3B82F6"  # Modern Blue
@@ -33,7 +31,10 @@ class ScriptCommanderApp(ctk.CTk):
         
         # Set App Icon
         if os.path.exists("favicon.ico"):
-            self.after(200, lambda: self.iconbitmap("favicon.ico"))
+            try:
+                self.after(200, lambda: self.iconbitmap("favicon.ico"))
+            except:
+                pass
 
         # Layout
         self.grid_columnconfigure(1, weight=1)
@@ -94,16 +95,30 @@ class ScriptCommanderApp(ctk.CTk):
         self.view_title.configure(text="Marketplace")
         self.clear_view()
         
-        # Load marketplace items (mocking a remote fetch)
-        try:
-            with open("marketplace_mock.json", "r") as f:
-                items = json.load(f)
-            
-            for item in items:
-                self.create_marketplace_card(item)
-        except Exception as e:
-            lbl = ctk.CTkLabel(self.scroll_frame, text=f"Error loading marketplace: {e}")
-            lbl.pack(pady=50)
+        self.status_label.configure(text="Fetching marketplace scripts...", text_color=ACCENT_COLOR)
+        
+        def fetch_market():
+            try:
+                response = requests.get(MARKETPLACE_URL, timeout=10)
+                response.raise_for_status()
+                items = response.json()
+                self.after(0, lambda: self.render_marketplace(items))
+            except Exception as e:
+                self.after(0, lambda: self.show_error(f"Marketplace Error: {e}"))
+
+        threading.Thread(target=fetch_market, daemon=True).start()
+
+    def render_marketplace(self, items):
+        self.clear_view()
+        for item in items:
+            self.create_marketplace_card(item)
+        self.status_label.configure(text="Marketplace loaded.", text_color="gray")
+
+    def show_error(self, message):
+        self.clear_view()
+        lbl = ctk.CTkLabel(self.scroll_frame, text=message, text_color="red")
+        lbl.pack(pady=50)
+        self.status_label.configure(text="Error occurred.", text_color="red")
 
     def create_marketplace_card(self, item):
         card = ctk.CTkFrame(self.scroll_frame, fg_color=CARD_BG, corner_radius=12)
@@ -118,7 +133,6 @@ class ScriptCommanderApp(ctk.CTk):
         lbl_desc = ctk.CTkLabel(info, text=item["description"], font=ctk.CTkFont(size=12), text_color="gray", anchor="w", wraplength=400)
         lbl_desc.pack(fill="x")
 
-        # Install/Download Button
         is_installed = os.path.exists(os.path.join(SCRIPTS_DIR, f"{item['id']}.ps1"))
         btn_text = "Installed" if is_installed else "Download"
         btn_state = "disabled" if is_installed else "normal"
@@ -129,27 +143,11 @@ class ScriptCommanderApp(ctk.CTk):
                                   command=lambda i=item: self.download_script(i))
         btn_action.pack(side="right", padx=20)
 
-import requests
-from tkinter import messagebox
-
-# Configuration
-APP_NAME = "Script Commander"
-VERSION = "2.0.0"
-SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
-# In production, this would be a URL to your hosted JSON (GitHub/Firebase)
-MARKETPLACE_URL = "https://raw.githubusercontent.com/example/scripts/main/marketplace.json" 
-
-# ... (keep existing color/style constants)
-
-class ScriptCommanderApp(ctk.CTk):
-    # ... (keep existing __init__ and sidebar logic)
-
     def download_script(self, item):
-        # Security Confirmation
         confirm = messagebox.askyesno(
             "Security Warning", 
             f"You are about to download '{item['name']}' from a remote source.\n\n" +
-            "Scripts can modify your system. Do you trust this author ({item['author']}) and want to proceed?"
+            f"Scripts can modify your system. Do you trust this author ({item['author']}) and want to proceed?"
         )
         
         if not confirm:
@@ -160,13 +158,10 @@ class ScriptCommanderApp(ctk.CTk):
         def do_download():
             target_path = os.path.join(SCRIPTS_DIR, f"{item['id']}.ps1")
             try:
-                # Real download logic
                 response = requests.get(item['url'], timeout=10)
                 response.raise_for_status()
-                
                 with open(target_path, "wb") as f:
                     f.write(response.content)
-                
                 self.after(0, lambda: self.status_label.configure(text=f"Successfully Installed {item['name']}", text_color=SUCCESS_COLOR))
                 self.after(0, self.show_marketplace)
             except Exception as e:
@@ -174,10 +169,11 @@ class ScriptCommanderApp(ctk.CTk):
 
         threading.Thread(target=do_download, daemon=True).start()
 
-
     def show_settings(self):
         self.view_title.configure(text="Settings")
         self.clear_view()
+        lbl = ctk.CTkLabel(self.scroll_frame, text=f"{APP_NAME}\nVersion {VERSION}\n\nScripts Directory:\n{SCRIPTS_DIR}", justify="left")
+        lbl.pack(pady=20, padx=20)
 
     def clear_view(self):
         for widget in self.scroll_frame.winfo_children():
@@ -188,7 +184,7 @@ class ScriptCommanderApp(ctk.CTk):
         if not os.path.exists(SCRIPTS_DIR):
             os.makedirs(SCRIPTS_DIR)
 
-        files = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".ps1")]
+        files = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".ps1") or f.endswith(".py")]
         
         if not files:
             lbl = ctk.CTkLabel(self.scroll_frame, text="No scripts found. Visit the Marketplace to download some!", text_color="gray")
@@ -202,18 +198,17 @@ class ScriptCommanderApp(ctk.CTk):
         card = ctk.CTkFrame(self.scroll_frame, fg_color=CARD_BG, corner_radius=12)
         card.pack(fill="x", pady=8, padx=5)
         
-        # Info Container
         info = ctk.CTkFrame(card, fg_color="transparent")
         info.pack(side="left", padx=20, pady=15, fill="both", expand=True)
         
-        name = filename.replace(".ps1", "").replace("-", " ")
+        name = filename.replace(".ps1", "").replace(".py", "").replace("-", " ")
         lbl_name = ctk.CTkLabel(info, text=name, font=ctk.CTkFont(size=16, weight="bold"), anchor="w")
         lbl_name.pack(fill="x")
         
-        lbl_desc = ctk.CTkLabel(info, text="Local PowerShell Utility", font=ctk.CTkFont(size=12), text_color="gray", anchor="w")
+        script_type = "PowerShell" if filename.endswith(".ps1") else "Python"
+        lbl_desc = ctk.CTkLabel(info, text=f"Local {script_type} Utility", font=ctk.CTkFont(size=12), text_color="gray", anchor="w")
         lbl_desc.pack(fill="x")
 
-        # Action Button
         btn_run = ctk.CTkButton(card, text="Execute", width=100, height=35,
                                fg_color=SUCCESS_COLOR, hover_color="#059669",
                                command=lambda f=filename: self.run_script(f))
@@ -224,11 +219,14 @@ class ScriptCommanderApp(ctk.CTk):
         self.status_label.configure(text=f"Executing {filename}...", text_color=ACCENT_COLOR)
         
         def execute():
-            # Security: Basic validation before execution
-            # In a real marketplace, we would check digital signatures or checksums here
-            ps_command = f"Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File \"{script_path}\" ' -Verb RunAs"
+            if filename.endswith(".ps1"):
+                ps_command = f"Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File \"{script_path}\" ' -Verb RunAs"
+                command = ["powershell", "-Command", ps_command]
+            else:
+                command = [sys.executable, script_path]
+
             try:
-                subprocess.run(["powershell", "-Command", ps_command], check=True)
+                subprocess.run(command, check=True)
                 self.after(0, lambda: self.status_label.configure(text=f"Success: {filename}", text_color=SUCCESS_COLOR))
             except Exception as e:
                 self.after(0, lambda: self.status_label.configure(text=f"Error: {str(e)}", text_color="red"))
