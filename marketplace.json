@@ -1,20 +1,22 @@
 [
-    {
-        "id": "md-to-pdf",
-        "name": "Markdown to PDF",
-        "description": "Convert your markdown files into professional PDF documents instantly.",
-        "author": "torresjchristopher",
-        "version": "1.0.0",
-        "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Convert-MarkdownToPDF.ps1",
-        "type": "powershell"
-    },
-    {
-        "id": "wsl-compact",
-        "name": "WSL Disk Compactor",
-        "description": "Reclaim space from your WSL2 virtual disks (vhdx).",
-        "author": "torresjchristopher",
-        "version": "1.1.0",
-        "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/compact_wsl.ps1",
-        "type": "powershell"
-    }
+    {"id": "sys-clean", "name": "System Cleaner", "description": "Clears Temp, Prefetch, and Log files.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/System-Cleaner.ps1", "verified": true},
+    {"id": "net-scan", "name": "Network Scanner", "description": "Discovers active devices on your local network.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Network-Scanner.ps1", "verified": true},
+    {"id": "disk-health", "name": "Disk Health Report", "description": "Checks SMART status and free space.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Disk-Health-Report.ps1", "verified": true},
+    {"id": "wifi-recov", "name": "WiFi Key Recovery", "description": "Retrieves saved WiFi passwords.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/WiFi-Key-Recovery.ps1", "verified": true},
+    {"id": "batt-report", "name": "Battery Health", "description": "Generates a Windows battery health report.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Battery-Health-Report.ps1", "verified": true},
+    {"id": "pwd-gen", "name": "Password Generator", "description": "Generates high-entropy random passwords.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Password-Generator.py", "verified": true},
+    {"id": "daily-brief", "name": "Daily Briefing", "description": "Summary of system status and IP info.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Daily-Briefing.py", "verified": true},
+    {"id": "desk-org", "name": "Desktop Organizer", "description": "Sorts desktop files into categorized folders.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Desktop-Organizer.ps1", "verified": true},
+    {"id": "hw-specs", "name": "Hardware Specs Export", "description": "Exports system hardware info to JSON.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Hardware-Specs-Export.ps1", "verified": true},
+    {"id": "env-var", "name": "Env Var Manager", "description": "Lists and manages user path variables.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Env-Var-Manager.ps1", "verified": true},
+    {"id": "proc-mon", "name": "Process Monitor", "description": "Identifies top memory-consuming processes.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Process-Monitor.ps1", "verified": true},
+    {"id": "file-search", "name": "File Content Searcher", "description": "Fast text search across local files.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/File-Content-Searcher.ps1", "verified": true},
+    {"id": "win-upd", "name": "Windows Update Force", "description": "Triggers manual Windows Update check.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Windows-Update-Force.ps1", "verified": true},
+    {"id": "auto-zip", "name": "Automated Zip Backup", "description": "Zips Documents folder to a timestamped file.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Automated-Zip-Backup.ps1", "verified": true},
+    {"id": "port-scan", "name": "Local Port Scanner", "description": "Checks for common open ports on localhost.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Local-Port-Scanner.py", "verified": true},
+    {"id": "bulk-rename", "name": "Bulk Renamer Pro", "description": "Batch renames files with a prefix.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Bulk-Renamer-Pro.py", "verified": true},
+    {"id": "wsl-compact", "name": "WSL Disk Compactor", "description": "Reclaims space from WSL2 virtual disks.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/WSL-Disk-Compactor.ps1", "verified": true},
+    {"id": "pub-ip", "name": "Get Public IP", "description": "Quickly fetches your external IP address.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Get-Public-IP.py", "verified": true},
+    {"id": "uptime", "name": "Uptime Checker", "description": "Shows total system uptime since last boot.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Uptime-Checker.ps1", "verified": true},
+    {"id": "active-conn", "name": "Active Connections", "description": "Lists established network connections.", "author": "Commander", "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Active-Connections.ps1", "verified": true}
 ]
