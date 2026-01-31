@@ -30,6 +30,10 @@ class ScriptCommanderApp(ctk.CTk):
         self.title(f"{APP_NAME} v{VERSION}")
         self.geometry("900x650")
         self.configure(fg_color=BG_DARK)
+        
+        # Set App Icon
+        if os.path.exists("favicon.ico"):
+            self.after(200, lambda: self.iconbitmap("favicon.ico"))
 
         # Layout
         self.grid_columnconfigure(1, weight=1)
