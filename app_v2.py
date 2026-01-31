@@ -13,8 +13,8 @@ APP_NAME = "Script Commander"
 VERSION = "2.0.0"
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
 METADATA_FILE = os.path.join(SCRIPTS_DIR, "metadata.json")
-# In production, this would be a URL to your hosted JSON (GitHub/Firebase)
-MARKETPLACE_URL = "https://raw.githubusercontent.com/example/scripts/main/marketplace.json" 
+# Official Marketplace URL
+MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json" 
 
 # Colors & Style
 ACCENT_COLOR = "#3B82F6"  # Modern Blue

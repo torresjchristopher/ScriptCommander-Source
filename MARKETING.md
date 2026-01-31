@@ -16,4 +16,4 @@ Built with a modern "Slate & Emerald" aesthetic. Our interface is designed to ge
 Whether you're a developer, a system administrator, or a power user, Script Commander provides the flexibility of PowerShell with the ease of a modern app.
 
 ---
-[Download Now](#) | [View Source Code](https://github.com/USER/ScriptCommander-Source)
+[Download Now](#) | [View Source Code](https://github.com/torresjchristopher/ScriptCommander-Source)

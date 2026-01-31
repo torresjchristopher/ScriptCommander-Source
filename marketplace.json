@@ -1,0 +1,20 @@
+[
+    {
+        "id": "md-to-pdf",
+        "name": "Markdown to PDF",
+        "description": "Convert your markdown files into professional PDF documents instantly.",
+        "author": "torresjchristopher",
+        "version": "1.0.0",
+        "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/Convert-MarkdownToPDF.ps1",
+        "type": "powershell"
+    },
+    {
+        "id": "wsl-compact",
+        "name": "WSL Disk Compactor",
+        "description": "Reclaim space from your WSL2 virtual disks (vhdx).",
+        "author": "torresjchristopher",
+        "version": "1.1.0",
+        "url": "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/compact_wsl.ps1",
+        "type": "powershell"
+    }
+]

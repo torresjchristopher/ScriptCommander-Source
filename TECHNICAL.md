@@ -18,5 +18,5 @@
 - `markdown-pdf`: High-fidelity document conversion.
 
 ## GitHub Repositories
-- **Source Code**: [ScriptCommander-Source](https://github.com/USER/ScriptCommander-Source)
-- **Official Scripts**: [ScriptCommander-Marketplace](https://github.com/USER/ScriptCommander-Scripts)
+- **Source Code**: [ScriptCommander-Source](https://github.com/torresjchristopher/ScriptCommander-Source)
+- **Official Scripts**: [ScriptCommander-Marketplace](https://github.com/torresjchristopher/ScriptCommander-Scripts)
