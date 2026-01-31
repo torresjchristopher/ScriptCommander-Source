@@ -38,79 +38,96 @@
     <!-- TAB: HOME -->
     <div id="home" class="tab-content active">
         <header class="py-20 text-center max-w-4xl mx-auto px-6">
-            <h1 class="text-6xl font-extrabold mb-6 tracking-tight">One Platform. <br/><span class="gradient-text">Unlimited Automation.</span></h1>
-            <p class="text-xl text-slate-400 mb-10 leading-relaxed">The open-source bridge between your terminal and your workflow. Download, manage, and execute PowerShell tools through a stunning, secure dashboard.</p>
-            <div class="flex flex-col items-center space-y-4">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 tracking-tight leading-[1.1]">One Platform. <br/><span class="gradient-text">Unlimited Automation.</span></h1>
+            <p class="text-lg text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">The open-source bridge between your terminal and your workflow. Download, manage, and execute PowerShell tools through a secure, high-performance dashboard.</p>
+            <div class="flex flex-col items-center space-y-6">
                 <div class="flex justify-center space-x-4">
-                    <button class="bg-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">Download v2.0.0</button>
-                    <a href="https://github.com/torresjchristopher/ScriptCommander-Scripts" target="_blank" class="border border-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-800 transition">Browse Scripts</a>
+                    <button class="bg-blue-600 px-8 py-3.5 rounded-lg font-semibold text-base hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/10">Download v2.0.0</button>
+                    <a href="https://github.com/torresjchristopher/ScriptCommander-Scripts" target="_blank" class="border border-slate-700 px-8 py-3.5 rounded-lg font-semibold text-base hover:bg-slate-800 transition-all">Browse Scripts</a>
                 </div>
-                <div class="w-full max-w-md bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between group">
-                    <code class="text-emerald-400 text-sm font-mono truncate">git clone https://github.com/torresjchristopher/ScriptCommander-Source.git</code>
-                    <button onclick="navigator.clipboard.writeText('git clone https://github.com/torresjchristopher/ScriptCommander-Source.git')" class="text-slate-500 hover:text-white transition text-xs uppercase font-bold ml-4">Copy</button>
+                <div class="w-full max-w-md bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between group">
+                    <code class="text-emerald-500/90 text-[13px] font-mono truncate pl-2">git clone https://github.com/torresjchristopher/ScriptCommander-Source.git</code>
+                    <button onclick="navigator.clipboard.writeText('git clone https://github.com/torresjchristopher/ScriptCommander-Source.git')" class="text-slate-500 hover:text-white transition-colors text-[10px] uppercase font-bold px-3 py-1.5 bg-slate-800 rounded-md">Copy</button>
                 </div>
             </div>
-            <div class="mt-16 bg-slate-950 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex h-[500px]">
+            <div class="mt-16 bg-slate-950 border border-slate-800/50 rounded-xl shadow-2xl overflow-hidden flex h-[480px]">
                 <!-- Sidebar Mockup -->
-                <div class="w-48 bg-slate-900 border-r border-slate-800 p-6 flex flex-col space-y-4">
-                    <div class="text-blue-500 font-bold text-xs uppercase tracking-widest mb-4">Commander</div>
-                    <div class="h-8 bg-blue-500/20 rounded-lg border border-blue-500/30 flex items-center px-3"><div class="w-2 h-2 rounded-full bg-blue-500 mr-2"></div><div class="h-2 w-16 bg-blue-500/40 rounded"></div></div>
-                    <div class="h-8 bg-slate-800/50 rounded-lg flex items-center px-3"><div class="w-2 h-2 rounded-full bg-slate-700 mr-2"></div><div class="h-2 w-20 bg-slate-700/40 rounded"></div></div>
-                    <div class="h-8 bg-slate-800/50 rounded-lg flex items-center px-3"><div class="w-2 h-2 rounded-full bg-slate-700 mr-2"></div><div class="h-2 w-12 bg-slate-700/40 rounded"></div></div>
+                <div class="w-44 bg-slate-900/50 border-r border-slate-800/50 p-6 flex flex-col space-y-4">
+                    <div class="text-blue-500/80 font-bold text-[10px] uppercase tracking-widest mb-4">Commander</div>
+                    <div class="h-7 bg-blue-500/10 rounded-md border border-blue-500/20 flex items-center px-3"><div class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2"></div><div class="h-1.5 w-16 bg-blue-500/30 rounded"></div></div>
+                    <div class="h-7 bg-slate-800/30 rounded-md flex items-center px-3"><div class="w-1.5 h-1.5 rounded-full bg-slate-700 mr-2"></div><div class="h-1.5 w-20 bg-slate-700/20 rounded"></div></div>
+                    <div class="h-7 bg-slate-800/30 rounded-md flex items-center px-3"><div class="w-1.5 h-1.5 rounded-full bg-slate-700 mr-2"></div><div class="h-1.5 w-12 bg-slate-700/20 rounded"></div></div>
                 </div>
                 <!-- Main Content Mockup -->
-                <div class="flex-1 p-8 text-left bg-[#0f172a]">
+                <div class="flex-1 p-8 text-left bg-[#0c1220]">
                     <div class="flex justify-between items-center mb-8">
-                        <div class="h-6 w-32 bg-slate-800 rounded"></div>
-                        <div class="h-8 w-24 bg-blue-600 rounded-lg"></div>
+                        <div class="h-5 w-28 bg-slate-800/50 rounded"></div>
+                        <div class="h-7 w-20 bg-blue-600/90 rounded-md"></div>
                     </div>
-                    <div class="space-y-4">
+                    <div class="space-y-3">
                         <!-- Script Card 1 -->
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                        <div class="bg-slate-900/50 border border-slate-800/40 p-4 rounded-lg flex items-center justify-between">
                             <div class="space-y-2">
-                                <div class="h-4 w-40 bg-slate-700 rounded"></div>
-                                <div class="h-2 w-64 bg-slate-800 rounded"></div>
+                                <div class="h-3.5 w-36 bg-slate-700/60 rounded"></div>
+                                <div class="h-1.5 w-56 bg-slate-800/40 rounded"></div>
                             </div>
-                            <div class="h-8 w-20 bg-emerald-600 rounded-lg"></div>
+                            <div class="h-7 w-16 bg-emerald-600/80 rounded-md"></div>
                         </div>
                         <!-- Script Card 2 -->
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                        <div class="bg-slate-900/50 border border-slate-800/40 p-4 rounded-lg flex items-center justify-between">
                             <div class="space-y-2">
-                                <div class="h-4 w-32 bg-slate-700 rounded"></div>
-                                <div class="h-2 w-56 bg-slate-800 rounded"></div>
+                                <div class="h-3.5 w-28 bg-slate-700/60 rounded"></div>
+                                <div class="h-1.5 w-48 bg-slate-800/40 rounded"></div>
                             </div>
-                            <div class="h-8 w-20 bg-emerald-600 rounded-lg"></div>
+                            <div class="h-7 w-16 bg-emerald-600/80 rounded-md"></div>
                         </div>
                         <!-- Script Card 3 -->
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                        <div class="bg-slate-900/50 border border-slate-800/40 p-4 rounded-lg flex items-center justify-between">
                             <div class="space-y-2">
-                                <div class="h-4 w-48 bg-slate-700 rounded"></div>
-                                <div class="h-2 w-72 bg-slate-800 rounded"></div>
+                                <div class="h-3.5 w-44 bg-slate-700/60 rounded"></div>
+                                <div class="h-1.5 w-64 bg-slate-800/40 rounded"></div>
                             </div>
-                            <div class="h-8 w-20 bg-emerald-600 rounded-lg"></div>
+                            <div class="h-7 w-16 bg-emerald-600/80 rounded-md"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
     </div>
+        </header>
+    </div>
 
     <!-- TAB: MARKETING -->
     <div id="marketing" class="tab-content py-20">
         <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-12 text-center">Engineered for <span class="text-emerald-400">Power Users</span></h2>
-            <div class="grid gap-8">
-                <div class="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 hover:border-blue-500 transition">
-                    <h3 class="text-2xl font-bold mb-4">🚀 One-Click Execution</h3>
-                    <p class="text-slate-400 text-lg">Stop digging through directories. Launch your most powerful PowerShell and Python tools instantly from a unified, beautiful dashboard.</p>
+            <h2 class="text-3xl font-bold mb-12 text-center tracking-tight">Engineered for <span class="text-blue-400">Power Users</span></h2>
+            <div class="grid gap-6">
+                <div class="bg-slate-900/40 p-6 rounded-xl border border-slate-800/50 hover:border-blue-500/50 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-2 bg-blue-500/10 rounded-lg mr-4">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold">One-Click Execution</h3>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed">Stop digging through directories. Launch your most powerful PowerShell and Python tools instantly from a unified, professional dashboard.</p>
                 </div>
-                <div class="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 hover:border-emerald-500 transition">
-                    <h3 class="text-2xl font-bold mb-4">🌎 Global Marketplace</h3>
-                    <p class="text-slate-400 text-lg">Download curated, secure automation tools directly into your app. From WSL compacters to Markdown converters, the community has you covered.</p>
+                <div class="bg-slate-900/40 p-6 rounded-xl border border-slate-800/50 hover:border-emerald-500/50 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-2 bg-emerald-500/10 rounded-lg mr-4">
+                            <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18"/></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold">Global Marketplace</h3>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed">Download curated, secure automation tools directly into your app. From WSL compacters to Markdown converters, the community has you covered.</p>
                 </div>
-                <div class="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 hover:border-purple-500 transition">
-                    <h3 class="text-2xl font-bold mb-4">🎨 Modern Experience</h3>
-                    <p class="text-slate-400 text-lg">A dark-mode first interface built for developers. High performance, zero bloat, and fully customizable.</p>
+                <div class="bg-slate-900/40 p-6 rounded-xl border border-slate-800/50 hover:border-blue-400/50 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-2 bg-blue-400/10 rounded-lg mr-4">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold">Modern Experience</h3>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed">A dark-mode first interface built for developers. High performance, zero bloat, and fully customizable with native Windows integration.</p>
                 </div>
             </div>
         </div>
@@ -119,30 +136,30 @@
     <!-- TAB: TECHNICAL -->
     <div id="technical" class="tab-content py-20">
         <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-12 text-center">Technical <span class="text-blue-400">Specifications</span></h2>
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+            <h2 class="text-3xl font-bold mb-12 text-center tracking-tight">Technical <span class="text-blue-400">Specifications</span></h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
                 <table class="w-full text-left">
                     <tr class="border-b border-slate-800">
-                        <td class="p-6 font-bold text-slate-400">Engine</td>
-                        <td class="p-6">Python 3.11+ / PowerShell Core</td>
+                        <td class="p-6 font-semibold text-slate-400 text-sm uppercase tracking-wider">Engine</td>
+                        <td class="p-6 text-slate-200">Python 3.11+ / PowerShell Core</td>
                     </tr>
                     <tr class="border-b border-slate-800">
-                        <td class="p-6 font-bold text-slate-400">UI Stack</td>
-                        <td class="p-6">CustomTkinter & Pillow (GPU Accelerated)</td>
+                        <td class="p-6 font-semibold text-slate-400 text-sm uppercase tracking-wider">UI Stack</td>
+                        <td class="p-6 text-slate-200">CustomTkinter & Pillow (GPU Accelerated)</td>
                     </tr>
                     <tr class="border-b border-slate-800">
-                        <td class="p-6 font-bold text-slate-400">Security</td>
-                        <td class="p-6">Dynamic Scoped Execution & UAC Elevation</td>
+                        <td class="p-6 font-semibold text-slate-400 text-sm uppercase tracking-wider">Security</td>
+                        <td class="p-6 text-slate-200">Dynamic Scoped Execution & UAC Elevation</td>
                     </tr>
                     <tr class="border-b border-slate-800">
-                        <td class="p-6 font-bold text-slate-400">Connectivity</td>
-                        <td class="p-6">Secure REST API (Marketplace JSON Over HTTPS)</td>
+                        <td class="p-6 font-semibold text-slate-400 text-sm uppercase tracking-wider">Connectivity</td>
+                        <td class="p-6 text-slate-200">Secure REST API (Marketplace JSON Over HTTPS)</td>
                     </tr>
                 </table>
             </div>
-            <div class="mt-12 grid grid-cols-2 gap-4">
-                <a href="https://github.com/torresjchristopher/ScriptCommander-Source" class="bg-slate-800 p-6 rounded-2xl text-center font-bold hover:bg-slate-700 transition">Source Repository</a>
-                <a href="https://github.com/torresjchristopher/ScriptCommander-Scripts" class="bg-slate-800 p-6 rounded-2xl text-center font-bold hover:bg-slate-700 transition">Marketplace Repository</a>
+            <div class="mt-8 grid grid-cols-2 gap-4">
+                <a href="https://github.com/torresjchristopher/ScriptCommander-Source" class="bg-slate-800/50 border border-slate-700 p-4 rounded-xl text-center font-semibold hover:bg-slate-800 transition">Source Repository</a>
+                <a href="https://github.com/torresjchristopher/ScriptCommander-Scripts" class="bg-slate-800/50 border border-slate-700 p-4 rounded-xl text-center font-semibold hover:bg-slate-800 transition">Marketplace Repository</a>
             </div>
         </div>
     </div>
@@ -150,18 +167,29 @@
     <!-- TAB: PRIVACY -->
     <div id="privacy" class="tab-content py-20">
         <div class="max-w-3xl mx-auto px-6 text-center">
-            <h2 class="text-4xl font-bold mb-8">Our Privacy <span class="text-blue-400">Promise</span></h2>
-            <div class="text-slate-400 text-xl space-y-8 leading-relaxed">
+            <h2 class="text-3xl font-bold mb-8 tracking-tight">Our Privacy <span class="text-blue-400">Promise</span></h2>
+            <div class="text-slate-400 text-lg space-y-8 leading-relaxed">
                 <p>We believe your automation data is your business. Script Commander is built on a foundation of absolute privacy.</p>
-                <div class="bg-blue-500/10 border border-blue-500/20 p-8 rounded-3xl text-left">
-                    <ul class="space-y-4">
-                        <li class="flex items-start"><span class="mr-3">✅</span> <strong>No Telemetry:</strong> We don't track what scripts you run or how often you use the app.</li>
-                        <li class="flex items-start"><span class="mr-3">✅</span> <strong>Local First:</strong> All your scripts are stored locally on your machine. We never upload your personal tools to our servers.</li>
-                        <li class="flex items-start"><span class="mr-3">✅</span> <strong>Zero Accounts:</strong> No signup required. No email tracking. Just download and automate.</li>
-                        <li class="flex items-start"><span class="mr-3">✅</span> <strong>Open Source:</strong> Don't take our word for it—inspect every line of code on GitHub.</li>
+                <div class="bg-slate-900/50 border border-slate-800 p-8 rounded-xl text-left">
+                    <ul class="space-y-6">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-500 mr-4 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span><strong>No Telemetry:</strong> We don't track what scripts you run or how often you use the app.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-500 mr-4 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span><strong>Local First:</strong> All your scripts are stored locally on your machine. We never upload your personal tools to our servers.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-500 mr-4 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span><strong>Zero Accounts:</strong> No signup required. No email tracking. Just download and automate.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-500 mr-4 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span><strong>Open Source:</strong> Don't take our word for it—inspect every line of code on GitHub.</span>
+                        </li>
                     </ul>
                 </div>
-                <p>Your machine. Your scripts. Your privacy.</p>
             </div>
         </div>
     </div>
