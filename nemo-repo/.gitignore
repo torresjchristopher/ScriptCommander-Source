@@ -1,0 +1,46 @@
+# Proprietary NEMO Modules (Compiled Only - Source Not Committed)
+nemo/systems/task-screen-simulator/nemo_rewind.py
+nemo/systems/task-screen-simulator/nemo_forward.py
+nemo/systems/task-screen-simulator/rewind_engine_v2.py
+nemo/systems/task-screen-simulator/rewind_engine_v3.py
+
+# Temporal synthesis (Proprietary)
+nemo/systems/task-screen-simulator/temporal_rewind.py
+nemo/systems/task-screen-simulator/temporal_forward.py
+nemo/systems/task-screen-simulator/agentic_synthesis.py
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.so
+*.pyd
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.bak
+*.log
