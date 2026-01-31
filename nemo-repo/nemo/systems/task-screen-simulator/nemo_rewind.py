@@ -40,11 +40,17 @@ NEMO_CODE = {
     '.': 'backspace', '>': 'backspace', '/': 'backspace', '?': 'backspace', '\\': 'backspace',
     '|': 'backspace', '`': 'backspace', '~': 'backspace',
     
-    # Navigation
+    # Navigation (Basic)
     'right': 'left',
     'left': 'right',
     'up': 'down',
     'down': 'up',
+    
+    # Navigation (Extended) - PHASE 1
+    'home': 'end',
+    'end': 'home',
+    'page up': 'page down',
+    'page down': 'page up',
     
     # Deletion
     'backspace': 'ctrl+z',
@@ -53,10 +59,16 @@ NEMO_CODE = {
     # Editing
     'enter': 'ctrl+z',
     'tab': 'backspace_spaces',
+    'escape': 'skip',  # Can't really reverse escape
     
     # Undo/Redo
     'ctrl+z': 'ctrl+y',
     'ctrl+y': 'ctrl+z',
+    
+    # Selection & Editing (PHASE 1) - CRITICAL
+    'ctrl+a': 'escape',  # Select all → deselect
+    'ctrl+c': 'skip',    # Copy (no visual change)
+    'ctrl+x': 'ctrl+z',  # Cut → undo
 }
 
 
