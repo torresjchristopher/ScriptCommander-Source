@@ -210,6 +210,31 @@ class ScriptCommanderApp(ctk.CTk):
         ctk.CTkLabel(container, text="All submissions undergo manual security review before appearing in the marketplace.", 
                      font=ctk.CTkFont(size=11), text_color="gray").pack(anchor="w")
 
+        # App Updates
+        ctk.CTkLabel(container, text="Application Updates", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(30, 10), anchor="w")
+        
+        btn_update = ctk.CTkButton(container, text="Check for Updates", fg_color="#475569",
+                                  command=self.update_application)
+        btn_update.pack(pady=5, anchor="w")
+
+    def update_application(self):
+        self.status_label.configure(text="Checking for updates...", text_color=ACCENT_COLOR)
+        
+        def run_git_pull():
+            try:
+                # Check if it's a git repo
+                result = subprocess.run(["git", "pull", "origin", "main"], capture_output=True, text=True, check=True)
+                if "Already up to date" in result.stdout:
+                    self.after(0, lambda: messagebox.showinfo("Update", "Script Commander is already up to date!"))
+                else:
+                    self.after(0, lambda: messagebox.showinfo("Update", "Updates downloaded! Please restart the application to apply changes."))
+                self.after(0, lambda: self.status_label.configure(text="Update check complete.", text_color="gray"))
+            except Exception as e:
+                self.after(0, lambda: messagebox.showerror("Update Error", f"Failed to update via Git: {e}\n\nPlease ensure Git is installed and you are in the repository folder."))
+                self.after(0, lambda: self.status_label.configure(text="Update failed.", text_color="red"))
+
+        threading.Thread(target=run_git_pull, daemon=True).start()
+
     def clear_view(self):
         for widget in self.scroll_frame.winfo_children():
             widget.destroy()
