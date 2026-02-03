@@ -196,5 +196,14 @@ class ShortcutTUI:
                             self.state = "MENU"
 
 if __name__ == "__main__":
-    tui = ShortcutTUI()
-    tui.main_loop()
+    if len(sys.argv) > 1:
+        # CLI Mode: Link to cli.py logic
+        try:
+            from cli import main as cli_main
+            cli_main()
+        except ImportError:
+            print("[Error] cli.py not found. Please ensure it is in the same directory.")
+    else:
+        # TUI Mode: Keep your original TUI logic untouched
+        tui = ShortcutTUI()
+        tui.main_loop()
