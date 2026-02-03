@@ -3,7 +3,7 @@
 
 $ProjectDir = Get-Location
 $DistDir = Join-Path $ProjectDir "dist"
-$ZipFile = Join-Path $ProjectDir "Shortcut-v3.0.0.zip"
+$ZipFile = Join-Path $ProjectDir "Shortcut-CLI-v3.0.0.zip"
 
 # 1. Install Dependencies
 pip install rich requests msvcrt-type-safe # msvcrt is builtin but rich/requests are needed

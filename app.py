@@ -13,8 +13,8 @@ from rich.text import Text
 from datetime import datetime
 
 # Configuration
-APP_NAME = "Shortcut"
-VERSION = "3.0.0 (TUI Edition)"
+APP_NAME = "Shortcut CLI"
+VERSION = "3.0.0"
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
 MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json"
 RECENT_FILES_PATH = os.path.join(os.environ['APPDATA'], 'Microsoft', 'Windows', 'Recent')

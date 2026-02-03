@@ -1,6 +1,6 @@
-# Shortcut (by Script Commander) v3.0.0
+# Shortcut CLI v3.0.0
 
-Shortcut is a high-performance **Terminal User Interface (TUI)** designed to bypass heavy GUIs and get you to your work instantly. It transforms your terminal into a command orchestration hub.
+Shortcut CLI is a high-performance terminal orchestrator designed to bypass heavy GUIs and get you to your work instantly.
 
 ## 🚀 Key Features
 
