@@ -1,395 +1,200 @@
-import customtkinter as ctk
 import os
-import subprocess
 import sys
-import threading
-import json
+import subprocess
 import requests
-from PIL import Image
-from tkinter import messagebox
+import msvcrt
+import shutil
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.live import Live
+from rich import box
+from rich.text import Text
+from datetime import datetime
 
 # Configuration
-APP_NAME = "Script Commander"
-VERSION = "2.0.0"
+APP_NAME = "Shortcut"
+VERSION = "3.0.0 (TUI Edition)"
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
 MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json"
+RECENT_FILES_PATH = os.path.join(os.environ['APPDATA'], 'Microsoft', 'Windows', 'Recent')
 
-# Colors & Style
-ACCENT_COLOR = "#3B82F6"  # Modern Blue
-SUCCESS_COLOR = "#10B981" # Emerald Green
-BG_DARK = "#111827"       # Slate 900
-CARD_BG = "#1F2937"       # Slate 800
+console = Console()
 
-class ScriptCommanderApp(ctk.CTk):
+class ShortcutTUI:
     def __init__(self):
-        super().__init__()
+        self.menu_options = ["Local Scripts", "Marketplace", "Recent Files", "Exit"]
+        self.current_index = 0
+        self.state = "MENU" # MENU, SCRIPTS, MARKET, RECENT
+        self.items = []
+        self.sub_index = 0
+        self.running = True
 
-        # Cache & Performance
-        self._market_cache = None
-        self._scripts_cache = {}
-
-        # Window Setup
-        self.title(f"{APP_NAME} v{VERSION}")
-        self.geometry("900x650")
-        self.configure(fg_color=BG_DARK)
-        
-        # Set App Icon
-        if os.path.exists("favicon.ico"):
-            try:
-                self.after(200, lambda: self.iconbitmap("favicon.ico"))
-            except:
-                pass
-
-        # Layout
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        # Sidebar
-        self.sidebar = ctk.CTkFrame(self, width=200, corner_radius=0, fg_color="#0F172A")
-        self.sidebar.grid(row=0, column=0, sticky="nsew")
-        
-        self.logo_label = ctk.CTkLabel(self.sidebar, text="COMMANDER", font=ctk.CTkFont(size=22, weight="bold"), text_color=ACCENT_COLOR)
-        self.logo_label.pack(pady=30, padx=20)
-
-        self.btn_local = self.create_sidebar_button("My Scripts", self.show_local_scripts)
-        self.btn_market = self.create_sidebar_button("Marketplace", self.show_marketplace)
-        self.btn_cli = self.create_sidebar_button("CLI Guide", self.show_cli_guide)
-        self.btn_settings = self.create_sidebar_button("Settings", self.show_settings)
-
-        # Main Content Area
-        self.main_container = ctk.CTkFrame(self, fg_color="transparent")
-        self.main_container.grid(row=0, column=1, sticky="nsew", padx=20, pady=20)
-        self.main_container.grid_columnconfigure(0, weight=1)
-        self.main_container.grid_rowconfigure(1, weight=1)
-
-        # Header
-        self.header = ctk.CTkFrame(self.main_container, fg_color="transparent")
-        self.header.grid(row=0, column=0, sticky="ew", pady=(0, 20))
-        
-        self.view_title = ctk.CTkLabel(self.header, text="My Scripts", font=ctk.CTkFont(size=28, weight="bold"))
-        self.view_title.pack(side="left")
-
-        # Search Bar
-        self.search_var = ctk.StringVar()
-        self.search_var.trace_add("write", lambda *args: self.filter_scripts())
-        self.search_entry = ctk.CTkEntry(self.header, placeholder_text="Search scripts...", 
-                                        textvariable=self.search_var, width=250)
-        self.search_entry.pack(side="right", padx=10)
-
-        self.refresh_btn = ctk.CTkButton(self.header, text="Refresh", width=100, fg_color=ACCENT_COLOR, command=self.load_scripts)
-        self.refresh_btn.pack(side="right")
-
-        # Scrollable Area
-        self.scroll_frame = ctk.CTkScrollableFrame(self.main_container, fg_color="transparent")
-        self.scroll_frame.grid(row=1, column=0, sticky="nsew")
-        self.scroll_frame.grid_columnconfigure(0, weight=1)
-
-        # Status
-        self.status_bar = ctk.CTkFrame(self, height=30, fg_color="#0F172A")
-        self.status_bar.grid(row=1, column=0, columnspan=2, sticky="ew")
-        self.status_label = ctk.CTkLabel(self.status_bar, text="System Ready", font=ctk.CTkFont(size=12), text_color="gray")
-        self.status_label.pack(side="left", padx=20)
-
-        self.load_scripts()
-
-    def create_sidebar_button(self, text, command):
-        btn = ctk.CTkButton(self.sidebar, text=text, command=command, 
-                            fg_color="transparent", text_color="white", 
-                            hover_color=CARD_BG, anchor="w", height=40)
-        btn.pack(fill="x", padx=10, pady=5)
-        return btn
-
-    def filter_scripts(self):
-        query = self.search_var.get().lower()
-        vt = self.view_title.cget("text")
-        if vt == "My Scripts":
-            self.load_scripts(query)
-        elif vt == "Official Marketplace":
-            self.show_marketplace(query)
-
-    def show_local_scripts(self):
-        self.view_title.configure(text="My Scripts")
-        self.load_scripts()
-
-    def show_marketplace(self, query=""):
-        self.view_title.configure(text="Official Marketplace")
-        
-        if not query and self._market_cache:
-            self.render_marketplace(self._market_cache)
-            return
-
-        self.clear_view()
-        sec_frame = ctk.CTkFrame(self.scroll_frame, fg_color="#064e3b", corner_radius=8)
-        sec_frame.pack(fill="x", pady=(0, 15), padx=5)
-        sec_lbl = ctk.CTkLabel(sec_frame, text="🛡️ All scripts in this marketplace have been manually audited for security.", 
-                               font=ctk.CTkFont(size=11, weight="bold"), text_color=SUCCESS_COLOR)
-        sec_lbl.pack(pady=8)
-
-        self.status_label.configure(text="Fetching verified scripts...", text_color=ACCENT_COLOR)
-        
-        def fetch_market():
-            try:
-                response = requests.get(MARKETPLACE_URL, timeout=10)
-                response.raise_for_status()
-                items = response.json()
-                self._market_cache = items
-                if query:
-                    items = [i for i in items if query in i["name"].lower() or query in i["description"].lower()]
-                self.after(0, lambda: self.render_marketplace(items))
-            except Exception as e:
-                self.after(0, lambda: self.show_error(f"Marketplace Error: {e}"))
-
-        threading.Thread(target=fetch_market, daemon=True).start()
-
-    def show_cli_guide(self):
-        self.view_title.configure(text="CLI Guide")
-        self.clear_view()
-        
-        guide_text = (
-            "Script Commander includes a powerful Command Line Interface (CLI) "
-            "for headless execution and automation.\n\n"
-            "How to use the CLI:\n"
-            "-------------------\n"
-            "1. Open Terminal/PowerShell in the app directory.\n"
-            "2. Run the following commands:\n\n"
-            "   List local scripts:\n"
-            "   > python app.py --list\n\n"
-            "   Browse Marketplace:\n"
-            "   > python app.py --market\n\n"
-            "   Navigate pages:\n"
-            "   > python app.py --market --page 2\n\n"
-            "Advanced Usage:\n"
-            "---------------\n"
-            "The CLI is built directly into the main executable. If you are using "
-            "the bundled .exe, you can run:\n"
-            "   > ./ScriptCommander.exe --list"
-        )
-        
-        card = ctk.CTkFrame(self.scroll_frame, fg_color=CARD_BG, corner_radius=12)
-        card.pack(fill="both", expand=True, padx=5, pady=5)
-        
-        lbl = ctk.CTkLabel(card, text=guide_text, justify="left", font=ctk.CTkFont(family="Consolas", size=13),
-                           padx=20, pady=20)
-        lbl.pack(fill="both")
-
-    def render_marketplace(self, items):
-        self.clear_view()
-        for item in items:
-            self.create_marketplace_card(item)
-        self.status_label.configure(text="Marketplace loaded.", text_color="gray")
-
-    def show_error(self, message):
-        self.clear_view()
-        lbl = ctk.CTkLabel(self.scroll_frame, text=message, text_color="red")
-        lbl.pack(pady=50)
-        self.status_label.configure(text="Error occurred.", text_color="red")
-
-    def create_marketplace_card(self, item):
-        card = ctk.CTkFrame(self.scroll_frame, fg_color=CARD_BG, corner_radius=12)
-        card.pack(fill="x", pady=8, padx=5)
-        
-        info = ctk.CTkFrame(card, fg_color="transparent")
-        info.pack(side="left", padx=20, pady=15, fill="both", expand=True)
-        
-        header_frame = ctk.CTkFrame(info, fg_color="transparent")
-        header_frame.pack(fill="x")
-        
-        lbl_name = ctk.CTkLabel(header_frame, text=item["name"], font=ctk.CTkFont(size=16, weight="bold"), anchor="w")
-        lbl_name.pack(side="left")
-        
-        if item.get("verified", False):
-            badge = ctk.CTkLabel(header_frame, text="✓ VERIFIED", font=ctk.CTkFont(size=9, weight="bold"), 
-                                 text_color=SUCCESS_COLOR, fg_color="#064e3b", corner_radius=4)
-            badge.pack(side="left", padx=10)
-        
-        lbl_desc = ctk.CTkLabel(info, text=item["description"], font=ctk.CTkFont(size=12), text_color="gray", anchor="w", wraplength=400)
-        lbl_desc.pack(fill="x")
-
-        is_installed = os.path.exists(os.path.join(SCRIPTS_DIR, f"{item['id']}.ps1"))
-        btn_text = "Installed" if is_installed else "Download"
-        btn_state = "disabled" if is_installed else "normal"
-        btn_color = "gray" if is_installed else ACCENT_COLOR
-
-        btn_action = ctk.CTkButton(card, text=btn_text, width=100, height=35,
-                                  fg_color=btn_color, state=btn_state,
-                                  command=lambda i=item: self.download_script(i))
-        btn_action.pack(side="right", padx=20)
-
-    def download_script(self, item):
-        confirm = messagebox.askyesno(
-            "Security Warning", 
-            f"You are about to download '{item['name']}' from a remote source.\n\n" +
-            f"Scripts can modify your system. Do you trust this author ({item['author']}) and want to proceed?"
-        )
-        
-        if not confirm:
-            return
-
-        self.status_label.configure(text=f"Downloading {item['name']}...", text_color=ACCENT_COLOR)
-        
-        def do_download():
-            target_path = os.path.join(SCRIPTS_DIR, f"{item['id']}.ps1")
-            try:
-                response = requests.get(item['url'], timeout=10)
-                response.raise_for_status()
-                with open(target_path, "wb") as f:
-                    f.write(response.content)
-                self.after(0, lambda: self.status_label.configure(text=f"Successfully Installed {item['name']}", text_color=SUCCESS_COLOR))
-                self.after(0, self.show_marketplace)
-            except Exception as e:
-                self.after(0, lambda: self.status_label.configure(text=f"Download Failed: {str(e)}", text_color="red"))
-
-        threading.Thread(target=do_download, daemon=True).start()
-
-    def show_settings(self):
-        self.view_title.configure(text="Settings")
-        self.clear_view()
-        
-        container = ctk.CTkFrame(self.scroll_frame, fg_color="transparent")
-        container.pack(pady=20, padx=20, fill="both", expand=True)
-
-        lbl = ctk.CTkLabel(container, text=f"{APP_NAME} v{VERSION}", font=ctk.CTkFont(size=20, weight="bold"))
-        lbl.pack(pady=(0, 10), anchor="w")
-        
-        lbl_path = ctk.CTkLabel(container, text=f"Scripts Directory:\n{SCRIPTS_DIR}", justify="left", text_color="gray")
-        lbl_path.pack(pady=10, anchor="w")
-
-        ctk.CTkLabel(container, text="Developer Portal", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(30, 10), anchor="w")
-        
-        btn_submit = ctk.CTkButton(container, text="Submit Tool to Marketplace", fg_color=ACCENT_COLOR,
-                                  command=lambda: subprocess.run(["explorer", "https://github.com/torresjchristopher/ScriptCommander-Scripts/issues/new"]))
-        btn_submit.pack(pady=5, anchor="w")
-        
-        ctk.CTkLabel(container, text="All submissions undergo manual security review before appearing in the marketplace.", 
-                     font=ctk.CTkFont(size=11), text_color="gray").pack(anchor="w")
-
-        ctk.CTkLabel(container, text="Application Updates", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=(30, 10), anchor="w")
-        
-        btn_update = ctk.CTkButton(container, text="Check for Updates", fg_color="#475569",
-                                  command=self.update_application)
-        btn_update.pack(pady=5, anchor="w")
-
-    def update_application(self):
-        self.status_label.configure(text="Checking for updates...", text_color=ACCENT_COLOR)
-        
-        def run_git_pull():
-            try:
-                result = subprocess.run(["git", "pull", "origin", "main"], capture_output=True, text=True, check=True)
-                if "Already up to date" in result.stdout:
-                    self.after(0, lambda: messagebox.showinfo("Update", "Script Commander is already up to date!"))
-                else:
-                    self.after(0, lambda: messagebox.showinfo("Update", "Updates downloaded! Please restart the application to apply changes."))
-                self.after(0, lambda: self.status_label.configure(text="Update check complete.", text_color="gray"))
-            except Exception as e:
-                self.after(0, lambda: messagebox.showerror("Update Error", f"Failed to update via Git: {e}"))
-                self.after(0, lambda: self.status_label.configure(text="Update failed.", text_color="red"))
-
-        threading.Thread(target=run_git_pull, daemon=True).start()
-
-    def clear_view(self):
-        for widget in self.scroll_frame.winfo_children():
-            widget.destroy()
-
-    def load_scripts(self, query=""):
-        self.clear_view()
+    def get_local_scripts(self):
         if not os.path.exists(SCRIPTS_DIR):
             os.makedirs(SCRIPTS_DIR)
+        return [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".ps1") or f.endswith(".py")]
 
-        files = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".ps1") or f.endswith(".py")]
-        filtered_files = [f for f in files if query in f.lower()]
-        
-        if not filtered_files:
-            msg = "No scripts found." if not query else f"No scripts matching '{query}'"
-            lbl = ctk.CTkLabel(self.scroll_frame, text=msg, text_color="gray")
-            lbl.pack(pady=50)
-            return
+    def get_marketplace(self):
+        try:
+            response = requests.get(MARKETPLACE_URL, timeout=5)
+            return response.json()
+        except:
+            return []
 
-        for script_file in filtered_files:
-            self.create_script_card(script_file)
+    def get_recent_files(self):
+        if not os.path.exists(RECENT_FILES_PATH):
+            return []
+        # Get last 15 recent files (links)
+        files = []
+        try:
+            items = os.listdir(RECENT_FILES_PATH)
+            full_paths = [os.path.join(RECENT_FILES_PATH, i) for i in items if i.endswith(".lnk")]
+            # Sort by modification time
+            full_paths.sort(key=os.path.getmtime, reverse=True)
+            for path in full_paths[:15]:
+                name = os.path.basename(path).replace(".lnk", "")
+                files.append({"name": name, "path": path})
+        except:
+            pass
+        return files
 
-    def create_script_card(self, filename):
-        card = ctk.CTkFrame(self.scroll_frame, fg_color=CARD_BG, corner_radius=12)
-        card.pack(fill="x", pady=8, padx=5)
+    def draw_menu(self):
+        table = Table(box=box.ROUNDED, show_header=False, expand=True, border_style="blue")
+        for i, option in enumerate(self.menu_options):
+            style = "bold white on blue" if i == self.current_index else "white"
+            prefix = "> " if i == self.current_index else "  "
+            table.add_row(Text(f"{prefix}{option}", style=style))
         
-        info = ctk.CTkFrame(card, fg_color="transparent")
-        info.pack(side="left", padx=20, pady=15, fill="both", expand=True)
-        
-        name = filename.replace(".ps1", "").replace(".py", "").replace("-", " ")
-        lbl_name = ctk.CTkLabel(info, text=name, font=ctk.CTkFont(size=16, weight="bold"), anchor="w")
-        lbl_name.pack(fill="x")
-        
-        script_type = "PowerShell" if filename.endswith(".ps1") else "Python"
-        lbl_desc = ctk.CTkLabel(info, text=f"Local {script_type} Utility", font=ctk.CTkFont(size=12), text_color="gray", anchor="w")
-        lbl_desc.pack(fill="x")
+        return Panel(table, title=f"[bold cyan]{APP_NAME}[/bold cyan] v{VERSION}", subtitle="[dim]Arrows to navigate, Enter to select")
 
-        btn_run = ctk.CTkButton(card, text="Execute", width=100, height=35,
-                               fg_color=SUCCESS_COLOR, hover_color="#059669",
-                               command=lambda f=filename: self.run_script(f))
-        btn_run.pack(side="right", padx=20)
+    def draw_list(self, title, items, index, is_market=False):
+        table = Table(box=box.ROUNDED, expand=True, border_style="green")
+        table.add_column("Selection", justify="center", width=4)
+        table.add_column("Name", style="bold")
+        if is_market:
+            table.add_column("Description")
+
+        for i, item in enumerate(items):
+            style = "reverse" if i == index else ""
+            prefix = ">>" if i == index else ""
+            
+            if is_market:
+                table.add_row(prefix, item["name"], item.get("description", ""), style=style)
+            elif isinstance(item, dict): # Recent files
+                table.add_row(prefix, item["name"], "", style=style)
+            else: # Local scripts
+                table.add_row(prefix, item, "", style=style)
+
+        return Panel(table, title=f"[bold green]{title}[/bold green]", subtitle="[dim]Enter to Execute/Download, 'q' to go back")
 
     def run_script(self, filename):
         script_path = os.path.join(SCRIPTS_DIR, filename)
-        self.status_label.configure(text=f"Executing {filename}...", text_color=ACCENT_COLOR)
+        console.clear()
+        console.print(Panel(f"Executing: [bold yellow]{filename}[/bold yellow]...", border_style="yellow"))
         
-        def execute():
-            if filename.endswith(".ps1"):
-                ps_command = f"Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File \"{script_path}\" ' -Verb RunAs"
-                command = ["powershell", "-Command", ps_command]
-            else:
-                command = [sys.executable, script_path]
-
-            try:
-                subprocess.run(command, check=True)
-                self.after(0, lambda: self.status_label.configure(text=f"Success: {filename}", text_color=SUCCESS_COLOR))
-            except Exception as e:
-                self.after(0, lambda: self.status_label.configure(text=f"Error: {str(e)}", text_color="red"))
-
-        threading.Thread(target=execute, daemon=True).start()
-
-def run_cli():
-    import argparse
-    parser = argparse.ArgumentParser(description="Script Commander CLI")
-    parser.add_argument("--list", action="store_true", help="List local scripts")
-    parser.add_argument("--market", action="store_true", help="List marketplace scripts")
-    parser.add_argument("--page", type=int, default=1, help="Page number (10 items per page)")
-    args = parser.parse_args()
-
-    PAGE_SIZE = 10
-    start_idx = (args.page - 1) * PAGE_SIZE
-    end_idx = start_idx + PAGE_SIZE
-
-    if args.list:
-        if not os.path.exists(SCRIPTS_DIR):
-            print("No scripts directory found.")
-            return
-        files = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".ps1") or f.endswith(".py")]
-        print(f"\n--- Local Scripts (Page {args.page}) ---")
-        for f in files[start_idx:end_idx]:
-            print(f"- {f}")
-        if len(files) > end_idx:
-            print(f"\nUse --page {args.page + 1} to see more.")
-    
-    elif args.market:
-        print("Fetching marketplace...")
+        if filename.endswith(".ps1"):
+            ps_command = f"Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File \"{script_path}\" ' -Verb RunAs"
+            command = ["powershell", "-Command", ps_command]
+        else:
+            command = [sys.executable, script_path]
+        
         try:
-            response = requests.get(MARKETPLACE_URL, timeout=10)
-            response.raise_for_status()
-            items = response.json()
-            print(f"\n--- Official Marketplace (Page {args.page}) ---")
-            for item in items[start_idx:end_idx]:
-                v = "[VERIFIED] " if item.get("verified") else ""
-                print(f"- {v}{item['name']}: {item['description'][:60]}...")
-            if len(items) > end_idx:
-                print(f"\nUse --page {args.page + 1} to see more.")
+            subprocess.run(command)
         except Exception as e:
-            print(f"Error: {e}")
-    else:
-        parser.print_help()
+            console.print(f"[red]Error: {e}[/red]")
+            console.input("\nPress Enter to continue...")
+
+    def download_script(self, item):
+        console.clear()
+        console.print(f"Downloading [bold cyan]{item['name']}[/bold cyan]...")
+        target_path = os.path.join(SCRIPTS_DIR, f"{item['id']}.ps1")
+        try:
+            response = requests.get(item['url'], timeout=10)
+            response.raise_for_status()
+            with open(target_path, "wb") as f:
+                f.write(response.content)
+            console.print("[bold green]Successfully Installed![/bold green]")
+        except Exception as e:
+            console.print(f"[red]Failed: {e}[/red]")
+        console.input("\nPress Enter to continue...")
+
+    def open_recent(self, item):
+        try:
+            os.startfile(item['path'])
+        except Exception as e:
+            console.print(f"[red]Error opening file: {e}[/red]")
+            console.input("\nPress Enter to continue...")
+
+    def main_loop(self):
+        with Live(refresh_per_second=10, screen=True) as live:
+            while self.running:
+                if self.state == "MENU":
+                    live.update(self.draw_menu())
+                elif self.state == "SCRIPTS":
+                    live.update(self.draw_list("My Local Scripts", self.items, self.sub_index))
+                elif self.state == "MARKET":
+                    live.update(self.draw_list("Verified Marketplace", self.items, self.sub_index, True))
+                elif self.state == "RECENT":
+                    live.update(self.draw_list("Recently Used Files (Quick Open)", self.items, self.sub_index))
+
+                if msvcrt.kbhit():
+                    key = ord(msvcrt.getch())
+                    if key == 224: # Arrow keys
+                        key = ord(msvcrt.getch())
+                        if key == 72: # Up
+                            if self.state == "MENU":
+                                self.current_index = (self.current_index - 1) % len(self.menu_options)
+                            else:
+                                self.sub_index = (self.sub_index - 1) % len(self.items) if self.items else 0
+                        elif key == 80: # Down
+                            if self.state == "MENU":
+                                self.current_index = (self.current_index + 1) % len(self.menu_options)
+                            else:
+                                self.sub_index = (self.sub_index + 1) % len(self.items) if self.items else 0
+                    
+                    elif key == 13: # Enter
+                        if self.state == "MENU":
+                            choice = self.menu_options[self.current_index]
+                            if choice == "Local Scripts":
+                                self.items = self.get_local_scripts()
+                                self.state = "SCRIPTS"
+                                self.sub_index = 0
+                            elif choice == "Marketplace":
+                                self.state = "MARKET"
+                                self.items = self.get_marketplace()
+                                self.sub_index = 0
+                            elif choice == "Recent Files":
+                                self.items = self.get_recent_files()
+                                self.state = "RECENT"
+                                self.sub_index = 0
+                            elif choice == "Exit":
+                                self.running = False
+                        
+                        elif self.state == "SCRIPTS":
+                            if self.items:
+                                live.stop()
+                                self.run_script(self.items[self.sub_index])
+                                live.start()
+                                self.items = self.get_local_scripts()
+                        
+                        elif self.state == "MARKET":
+                            if self.items:
+                                live.stop()
+                                self.download_script(self.items[self.sub_index])
+                                live.start()
+
+                        elif self.state == "RECENT":
+                            if self.items:
+                                self.open_recent(self.items[self.sub_index])
+                                self.running = False # Exit after opening to stay fast
+
+                    elif key == ord('q') or key == 27: # 'q' or Esc
+                        if self.state == "MENU":
+                            self.running = False
+                        else:
+                            self.state = "MENU"
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        run_cli()
-    else:
-        ctk.set_appearance_mode("Dark")
-        app = ScriptCommanderApp()
-        app.mainloop()
+    tui = ShortcutTUI()
+    tui.main_loop()

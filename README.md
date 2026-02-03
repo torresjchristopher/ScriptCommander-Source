@@ -1,42 +1,29 @@
-# Script Commander v2.0.0
+# Shortcut (by Script Commander) v3.0.0
 
-Script Commander is a modern, open-source automation dashboard that allows you to manage and execute PowerShell and Python scripts with a single click. It features a curated marketplace for community-built tools and a focus on security and privacy.
+Shortcut is a high-performance **Terminal User Interface (TUI)** designed to bypass heavy GUIs and get you to your work instantly. It transforms your terminal into a command orchestration hub.
 
-## Features
+## 🚀 Key Features
 
-- 🚀 **One-Click Execution**: Launch complex tools instantly.
-- 💻 **Headless CLI**: Full script management from the terminal.
-- 🌎 **Global Marketplace**: Download verified scripts from the official repository.
-- 🛡️ **Security First**: Dynamic execution policies and UAC integration.
-- 🎨 **Modern UI**: Dark-mode interface built with CustomTkinter.
+- **TUI "Flipping"**: Navigate through your scripts with arrow keys—no more searching through folders.
+- **Recent Files (Quick Open)**: Instantly open your most recent Word docs, PDFs, or projects directly from the terminal. Bypasses the "Open File" menu of heavy applications.
+- **Verified Marketplace**: Pull audited automation scripts directly into your local library.
+- **Keyboard-First**: Optimized for speed. Keep your hands on the keys.
 
-## Getting Started
+## 🛠️ Installation
 
-### Prerequisites
+### The Executable
+Download `Shortcut.exe` from our website. Add it to your PATH to launch it from anywhere by just typing `shortcut`.
 
-- Python 3.11 or higher
-- Windows 10/11 (PowerShell 5.1+)
+### From Source
+```bash
+pip install -r requirements.txt
+python app.py
+```
 
-### Running the Application
-
-1. **Option A: The Executable (Recommended)**
-   Download the latest `.zip` from our website, extract it, and run `ScriptCommander.exe`.
-
-2. **Option B: From Source**
-   ```bash
-   pip install -r requirements.txt
-   python app.py
-   ```
-
-## CLI Usage
-
-Script Commander features a robust CLI for power users:
-
-- **List Local Scripts**: `python app.py --list`
-- **Browse Marketplace**: `python app.py --market`
-- **Pagination**: `python app.py --market --page 2`
-
-*If using the executable, replace `python app.py` with `ScriptCommander.exe`.*
+## 🎮 Navigation
+- **Arrows**: Navigate menus and lists.
+- **Enter**: Execute script or open file.
+- **'q' or Esc**: Go back or exit.
 
 ## Usage
 

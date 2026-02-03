@@ -4,3 +4,5 @@ Pillow
 packaging
 markdown-pdf
 pymupdf
+rich
+click
