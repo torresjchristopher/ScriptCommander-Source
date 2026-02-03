@@ -1,0 +1,20 @@
+{
+    "default_routine": {
+        "browser_urls": ["https://github.com", "https://slack.com", "https://trello.com"],
+        "apps": ["code", "slack"],
+        "scripts": ["system-pulse.ps1"]
+    },
+    "projects": {
+        "Shortcut-Dev": {
+            "path": "C:\\Users\\serro\\yukora\\shortcut-cli",
+            "git_remote": "origin",
+            "docker": false,
+            "slack_channel": "#dev-updates"
+        },
+        "Marketing-Campaign": {
+            "path": "C:\\Work\\Campaign",
+            "urls": ["https://ads.google.com", "https://analytics.google.com"],
+            "notes": "Remember to check the CTR metrics."
+        }
+    }
+}

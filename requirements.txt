@@ -1,8 +1,10 @@
-customtkinter
-requests
-Pillow
-packaging
-markdown-pdf
-pymupdf
 rich
+requests
 click
+pyinstaller
+psutil
+python-docx
+pillow
+cryptography
+pyperclip
+moviepy

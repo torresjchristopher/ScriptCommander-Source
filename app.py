@@ -10,11 +10,12 @@ from rich.panel import Panel
 from rich.live import Live
 from rich import box
 from rich.text import Text
+from rich.syntax import Syntax
 from datetime import datetime
 
 # Configuration
 APP_NAME = "Shortcut CLI"
-VERSION = "3.1.0"
+VERSION = "3.2.0"
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
 QUARANTINE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "quarantine")
 MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json"
@@ -24,9 +25,19 @@ console = Console()
 
 class ShortcutTUI:
     def __init__(self):
-        self.menu_options = ["Local Scripts", "Marketplace", "Quick Explorer", "Recent Files", "Exit"]
+        # PROMOTED MENU: Putting the magic front and center
+        self.menu_options = [
+            "🚀 Workspaces (Morning Routine)", 
+            "📧 Comms Hub (Email/Slack)", 
+            "📂 Local Scripts", 
+            "🌐 Marketplace", 
+            "🔍 GitHub Search", 
+            "📁 Quick Explorer", 
+            "🕒 Recent Files", 
+            "Exit"
+        ]
         self.current_index = 0
-        self.state = "MENU" # MENU, SCRIPTS, MARKET, RECENT, EXPLORER
+        self.state = "MENU" # MENU, SCRIPTS, MARKET, RECENT, EXPLORER, SEARCH
         self.items = []
         self.sub_index = 0
         self.current_path = os.path.expanduser("~") # For Explorer
@@ -57,9 +68,24 @@ class ShortcutTUI:
         except:
             return []
 
-    def get_recent_files(self):
-        if not os.path.exists(RECENT_FILES_PATH):
+    def search_github(self, query):
+        url = f"https://api.github.com/search/code?q={query}+extension:ps1+extension:py"
+        try:
+            headers = {'Accept': 'application/vnd.github.v3+json'}
+            response = requests.get(url, headers=headers, timeout=10)
+            items = response.json().get('items', [])
+            results = []
+            for item in items[:15]:
+                repo = item['repository']['full_name']
+                name = item['name']
+                download_url = item['html_url'].replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+                results.append({"name": f"{name} ({repo})", "url": download_url, "id": name, "status": "Global"})
+            return results
+        except:
             return []
+
+    def get_recent_files(self):
+        if not os.path.exists(RECENT_FILES_PATH): return []
         files = []
         try:
             items = os.listdir(RECENT_FILES_PATH)
@@ -68,14 +94,12 @@ class ShortcutTUI:
             for path in full_paths[:15]:
                 name = os.path.basename(path).replace(".lnk", "")
                 files.append({"name": name, "path": path})
-        except:
-            pass
+        except: pass
         return files
 
     def get_explorer_items(self):
         try:
             items = []
-            # Add ".." to go back
             items.append({"name": ".. [Go Back]", "path": os.path.dirname(self.current_path), "type": "dir"})
             with os.scandir(self.current_path) as it:
                 for entry in it:
@@ -83,8 +107,7 @@ class ShortcutTUI:
                         t = "dir" if entry.is_dir() else "file"
                         items.append({"name": entry.name, "path": entry.path, "type": t})
             return sorted(items, key=lambda x: (x['type'] != 'dir', x['name'].lower()))
-        except:
-            return [{"name": "Permission Denied", "path": self.current_path, "type": "error"}]
+        except: return [{"name": "Permission Denied", "path": self.current_path, "type": "error"}]
 
     def draw_menu(self):
         table = Table(box=box.ROUNDED, show_header=False, expand=True, border_style="blue")
@@ -112,16 +135,36 @@ class ShortcutTUI:
             elif is_explorer:
                 icon = "📁" if item['type'] == 'dir' else "📄"
                 table.add_row(prefix, f"{icon} {item['name']}", style=style)
-            elif isinstance(item, dict): # Recent or Local
+            elif isinstance(item, dict):
                 status = item.get("status", "")
                 s_style = "bold red" if status == "QUARANTINE" else "dim"
                 table.add_row(prefix, item["name"], Text(status, style=s_style), style=style)
             else:
                 table.add_row(prefix, str(item), "", style=style)
 
-        sub = "[dim]Enter: Action | 'q': Back | Arrows: Flip[/dim]"
+        sub = "[dim]Enter: Action | 'v': View Code | 'q': Back[/dim]"
         if is_explorer: sub = f"[bold cyan]{self.current_path}[/bold cyan] | {sub}"
         return Panel(table, title=f"[bold green]{title}[/bold green]", subtitle=sub)
+
+    def view_code(self, item):
+        path = item.get('path')
+        content = ""
+        if path and os.path.exists(path):
+            try:
+                with open(path, 'r', errors='ignore') as f:
+                    content = f.read()
+            except: content = "Error reading file."
+        elif item.get('url'):
+            console.clear()
+            console.print("[cyan]Fetching preview from GitHub...[/cyan]")
+            try:
+                content = requests.get(item['url'], timeout=5).text
+            except: content = "Could not fetch preview."
+
+        console.clear()
+        syntax = Syntax(content, "python" if item['name'].endswith(".py") else "powershell", theme="monokai", line_numbers=True)
+        console.print(Panel(syntax, title=f"[bold]Preview: {item['name']}[/bold]", border_style="blue"))
+        console.input("\n[dim]Press Enter to return...[/dim]")
 
     def run_script(self, item):
         script_path = item['path']
@@ -129,81 +172,49 @@ class ShortcutTUI:
         
         console.clear()
         if is_quarantine:
-            console.print(Panel("[bold red]SECURITY WARNING[/bold red]\nThis script is in QUARANTINE. It has not been verified.", border_style="red"))
-            console.print("[yellow]Potentially dangerous commands check...[/yellow]")
-            dangerous = ["rm ", "format ", "net user", "del ", "Invoke-WebRequest", "wget"]
-            found = []
-            try:
-                with open(script_path, 'r', errors='ignore') as f:
-                    content = f.read().lower()
-                    for d in dangerous:
-                        if d in content: found.append(d)
-            except: pass
-            
-            if found:
-                console.print(f"[bold red]DANGER:[/bold red] Found potential risk keywords: {', '.join(found)}")
-            
-            if not console.input("\nType 'run' to proceed anyway: ").lower() == 'run':
-                return
+            console.print(Panel("[bold red]SECURITY WARNING[/bold red]\nThis script is unverified.", border_style="red"))
+            if not console.input("Type 'run' to proceed: ").lower() == 'run': return
 
         console.print(Panel(f"Executing: [bold yellow]{item['name']}[/bold yellow]\n[dim]Capturing output...[/dim]", border_style="yellow"))
-        
-        if script_path.endswith(".ps1"):
-            command = ["powershell", "-ExecutionPolicy", "Bypass", "-File", script_path]
-        else:
-            command = [sys.executable, script_path]
+        cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-File", script_path] if script_path.endswith(".ps1") else [sys.executable, script_path]
         
         try:
-            # Run and capture output
-            result = subprocess.run(command, capture_output=True, text=True)
-            
-            if result.stdout:
-                console.print("\n[bold white]Output:[/bold white]")
-                console.print(result.stdout)
-            
-            if result.returncode == 0:
-                console.print("\n[bold green]✓ Execution Successful[/bold green]")
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            if result.stdout: console.print(f"\n[bold white]Output:[/bold white]\n{result.stdout}")
+            if result.returncode != 0:
+                console.print(f"\n[bold red]✕ Failed (Exit {result.returncode})[/bold red]")
+                if result.stderr: console.print(f"[red]{result.stderr}[/red]")
             else:
-                console.print(f"\n[bold red]✕ Failed (Exit Code: {result.returncode})[/bold red]")
-                if result.stderr:
-                    console.print(f"[red]{result.stderr}[/red]")
-        except Exception as e:
-            console.print(f"[red]Execution Error: {e}[/red]")
-        
-        console.input("\n[dim]Press Enter to return to Shortcut...[/dim]")
+                console.print("\n[bold green]✓ Execution Successful[/bold green]")
+        except Exception as e: console.print(f"[red]Error: {e}[/red]")
+        console.input("\n[dim]Press Enter to return...[/dim]")
 
     def download_script(self, item, is_global=False):
         console.clear()
         dest = QUARANTINE_DIR if is_global else SCRIPTS_DIR
-        console.print(f"Downloading [bold cyan]{item['name']}[/bold cyan] to {os.path.basename(dest)}...")
-        target_path = os.path.join(dest, f"{item['id']}.ps1" if not item['name'].endswith(('.ps1', '.py')) else item['name'])
+        console.print(f"Downloading [bold cyan]{item['name']}[/bold cyan]...")
+        target_path = os.path.join(dest, item['name'])
         try:
             response = requests.get(item['url'], timeout=10)
-            response.raise_for_status()
             with open(target_path, "wb") as f:
                 f.write(response.content)
-            console.print("[bold green]Successfully Downloaded![/bold green]")
-        except Exception as e:
-            console.print(f"[red]Failed: {e}[/red]")
+            console.print("[bold green]Success![/bold green]")
+        except Exception as e: console.print(f"[red]Failed: {e}[/red]")
         console.input("\nPress Enter to continue...")
 
     def main_loop(self):
         with Live(refresh_per_second=10, screen=True) as live:
             while self.running:
-                if self.state == "MENU":
-                    live.update(self.draw_menu())
-                elif self.state == "SCRIPTS":
-                    live.update(self.draw_list("My Scripts", self.items, self.sub_index))
-                elif self.state == "MARKET":
-                    live.update(self.draw_list("Verified Marketplace", self.items, self.sub_index, True))
-                elif self.state == "RECENT":
-                    live.update(self.draw_list("Quick Open Files", self.items, self.sub_index))
-                elif self.state == "EXPLORER":
-                    live.update(self.draw_list("Quick Explorer", self.items, self.sub_index, is_explorer=True))
+                if self.state == "MENU": live.update(self.draw_menu())
+                elif self.state == "SCRIPTS": live.update(self.draw_list("My Scripts", self.items, self.sub_index))
+                elif self.state == "MARKET": live.update(self.draw_list("Verified Marketplace", self.items, self.sub_index, True))
+                elif self.state == "SEARCH": live.update(self.draw_list("GitHub Global Search", self.items, self.sub_index))
+                elif self.state == "RECENT": live.update(self.draw_list("Quick Open Files", self.items, self.sub_index))
+                elif self.state == "EXPLORER": live.update(self.draw_list("Quick Explorer", self.items, self.sub_index, is_explorer=True))
 
                 if msvcrt.kbhit():
                     key = ord(msvcrt.getch())
-                    if key == 224: # Arrow keys
+                    if key == 224:
                         key = ord(msvcrt.getch())
                         if key == 72: # Up
                             if self.state == "MENU": self.current_index = (self.current_index - 1) % len(self.menu_options)
@@ -215,54 +226,46 @@ class ShortcutTUI:
                     elif key == 13: # Enter
                         if self.state == "MENU":
                             choice = self.menu_options[self.current_index]
-                            if choice == "Local Scripts":
-                                self.state = "SCRIPTS"; self.items = self.get_local_scripts(); self.sub_index = 0
-                            elif choice == "Quick Explorer":
-                                self.state = "EXPLORER"; self.items = self.get_explorer_items(); self.sub_index = 0
-                            elif choice == "Marketplace":
-                                self.state = "MARKET"; self.items = self.get_marketplace(); self.sub_index = 0
-                            elif choice == "Recent Files":
-                                self.state = "RECENT"; self.items = self.get_recent_files(); self.sub_index = 0
-                            elif choice == "Exit": self.running = False
-                        
+                            if "Workspaces" in choice:
+                                live.stop(); subprocess.run([sys.executable, os.path.join(SCRIPTS_DIR, "morning-routine.py")]); live.start()
+                            elif "Comms Hub" in choice:
+                                live.stop(); subprocess.run([sys.executable, os.path.join(SCRIPTS_DIR, "comms-hub.py")]); live.start()
+                            elif "Local Scripts" in choice: self.state = "SCRIPTS"; self.items = self.get_local_scripts(); self.sub_index = 0
+                            elif "Quick Explorer" in choice: self.state = "EXPLORER"; self.items = self.get_explorer_items(); self.sub_index = 0
+                            elif "GitHub Search" in choice:
+                                live.stop()
+                                q = console.input("[bold cyan]GitHub Search Query: [/bold cyan]")
+                                self.items = self.search_github(q); self.state = "SEARCH"; self.sub_index = 0
+                                live.start()
+                            elif "Marketplace" in choice: self.state = "MARKET"; self.items = self.get_marketplace(); self.sub_index = 0
+                            elif "Recent Files" in choice: self.state = "RECENT"; self.items = self.get_recent_files(); self.sub_index = 0
+                            elif "Exit" in choice: self.running = False
                         elif self.state == "SCRIPTS":
-                            if self.items:
-                                live.stop(); self.run_script(self.items[self.sub_index]); live.start()
-                                self.items = self.get_local_scripts()
-                        
+                            if self.items: live.stop(); self.run_script(self.items[self.sub_index]); live.start()
                         elif self.state == "EXPLORER":
                             if self.items:
                                 item = self.items[self.sub_index]
-                                if item['type'] == 'dir':
-                                    self.current_path = item['path']
-                                    self.items = self.get_explorer_items()
-                                    self.sub_index = 0
-                                else:
-                                    os.startfile(item['path'])
-                                    self.running = False # Fast exit after opening file
-
+                                if item['type'] == 'dir': self.current_path = item['path']; self.items = self.get_explorer_items(); self.sub_index = 0
+                                else: os.startfile(item['path']); self.running = False
                         elif self.state == "MARKET":
-                            if self.items:
-                                live.stop(); self.download_script(self.items[self.sub_index]); live.start()
-
+                            if self.items: live.stop(); self.download_script(self.items[self.sub_index]); live.start()
+                        elif self.state == "SEARCH":
+                            if self.items: live.stop(); self.download_script(self.items[self.sub_index], is_global=True); live.start()
                         elif self.state == "RECENT":
-                            if self.items:
-                                os.startfile(self.items[self.sub_index]['path'])
-                                self.running = False
+                            if self.items: os.startfile(self.items[self.sub_index]['path']); self.running = False
 
-                    elif key == ord('q') or key == 27: # Back
+                    elif key == ord('v'): # View Code
+                        if self.state in ["SCRIPTS", "MARKET", "SEARCH"]:
+                            if self.items: live.stop(); self.view_code(self.items[self.sub_index]); live.start()
+
+                    elif key == ord('q') or key == 27:
                         if self.state == "MENU": self.running = False
                         else: self.state = "MENU"
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        # CLI Mode
-        try:
-            from cli import main as cli_main
-            cli_main()
-        except ImportError:
-            print("[Error] cli.py not found.")
+        try: from cli import main as cli_main; cli_main()
+        except ImportError: print("[Error] cli.py not found.")
     else:
-        # TUI Mode
         tui = ShortcutTUI()
         tui.main_loop()
