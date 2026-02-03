@@ -3,227 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shortcut CLI | The High-Speed Terminal Orchestrator</title>
+    <title>Shortcut CLI | High-Performance Terminal Orchestrator</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-main: #0a0a0a;
+            --accent: #2563eb;
+            --border: rgba(255, 255, 255, 0.1);
+        }
         body { 
-            background-color: #030712; 
-            color: #f8fafc; 
+            background-color: var(--bg-main); 
+            color: #ededed; 
             font-family: 'Inter', sans-serif; 
-            scroll-behavior: smooth; 
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
         }
-        .glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .nav-link.active { color: #fff; border-bottom: 2px solid var(--accent); }
+        .terminal-block {
+            background: #111;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .btn-gradient {
+            background: linear-gradient(to bottom right, #2563eb, #1d4ed8);
+            transition: all 0.2s ease;
         }
-        .tab-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
-        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
-        .nav-link.active { 
-            color: #60a5fa; 
-            background: rgba(59, 130, 246, 0.1);
-            border-bottom: 2px solid #3b82f6; 
-        }
-        .feature-card:hover {
-            border-color: rgba(96, 165, 250, 0.5);
-            background: rgba(30, 41, 59, 0.5);
-        }
-        code { font-family: 'JetBrains Mono', monospace; }
+        .btn-gradient:hover { filter: brightness(1.1); transform: translateY(-1px); }
     </style>
 </head>
-<body class="antialiased selection:bg-blue-500/30">
-    <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+<body class="selection:bg-blue-500/30">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 border-b border-white/[0.05] bg-[#0a0a0a]/80 backdrop-blur-xl">
         <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">S</div>
-                <span class="text-xl font-extrabold tracking-tight">SHORTCUT<span class="text-blue-500">CLI</span></span>
+            <div class="flex items-center space-x-3">
+                <div class="w-7 h-7 bg-blue-600 rounded flex items-center justify-center font-bold text-white text-sm">S</div>
+                <span class="text-lg font-bold tracking-tight text-white">Shortcut CLI</span>
             </div>
-            <div class="hidden md:flex space-x-1">
-                <button onclick="showTab('home')" id="nav-home" class="nav-link px-4 py-2 rounded-t-md text-sm font-medium transition-all active">Home</button>
-                <button onclick="showTab('features')" id="nav-features" class="nav-link px-4 py-2 rounded-t-md text-sm font-medium transition-all">Features</button>
-                <button onclick="showTab('technical')" id="nav-technical" class="nav-link px-4 py-2 rounded-t-md text-sm font-medium transition-all">Tech Specs</button>
-                <button onclick="showTab('privacy')" id="nav-privacy" class="nav-link px-4 py-2 rounded-t-md text-sm font-medium transition-all">Privacy</button>
+            <div class="hidden md:flex space-x-8">
+                <button onclick="showTab('home')" id="nav-home" class="nav-link text-sm font-medium text-slate-400 hover:text-white transition-colors py-5 active">Product</button>
+                <button onclick="showTab('features')" id="nav-features" class="nav-link text-sm font-medium text-slate-400 hover:text-white transition-colors py-5">Features</button>
+                <button onclick="showTab('technical')" id="nav-technical" class="nav-link text-sm font-medium text-slate-400 hover:text-white transition-colors py-5">Technical</button>
+                <button onclick="showTab('privacy')" id="nav-privacy" class="nav-link text-sm font-medium text-slate-400 hover:text-white transition-colors py-5">Privacy</button>
             </div>
-            <a href="Shortcut-CLI-v3.0.0.zip" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-lg shadow-blue-500/20">DOWNLOAD v3.0</a>
+            <div class="flex items-center space-x-4">
+                <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                </a>
+            </div>
         </div>
     </nav>
 
-    <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto">
-        <!-- TAB: HOME -->
+    <!-- Main Content -->
+    <main class="pt-32 pb-24 max-w-6xl mx-auto px-6">
+        
+        <!-- SECTION: HOME -->
         <div id="home" class="tab-content active">
-            <div class="text-center space-y-8 max-w-4xl mx-auto">
-                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest">
-                    <span>Terminal Orchestration Reimagined</span>
-                </div>
-                <h1 class="text-6xl md:text-7xl font-extrabold tracking-tight leading-none">
-                    One Command. <br/><span class="gradient-text">Instant Workflow.</span>
-                </h1>
-                <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                    The bridge between terminal speed and visual discoverability. Shortcut CLI is a high-performance orchestrator designed to bypass heavy GUIs and get you to your work instantly.
-                </p>
-                <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 pt-6">
-                    <a href="Shortcut-CLI-v3.0.0.zip" class="w-full md:w-auto bg-white text-black px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-200 transition-all shadow-xl">Get Started Now</a>
-                    <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="w-full md:w-auto glass px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/5 transition-all">View on GitHub</a>
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2 space-y-8">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[11px] font-bold uppercase tracking-widest">
+                        v3.0.0 Stable Release
+                    </div>
+                    <h1 class="text-6xl font-extrabold tracking-tight text-white leading-[1.05]">
+                        The terminal <br/><span class="text-blue-500">orchestrator.</span>
+                    </h1>
+                    <p class="text-lg text-slate-400 leading-relaxed max-w-lg">
+                        Accelerate your workflow with a high-performance interface for script execution and file discovery. Designed for speed, engineered for absolute privacy.
+                    </p>
+                    
+                    <!-- Professional Install Block -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Install via PowerShell</label>
+                        <div class="flex items-center bg-[#111] border border-white/10 rounded-lg p-1.5 pl-4 max-w-md group">
+                            <code class="text-blue-400 text-[13px] mono truncate flex-1">irm shortcut.cli.sh | iex</code>
+                            <button onclick="copyInstall()" class="bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-1.5 rounded-md text-[11px] font-bold transition-all uppercase">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-6 pt-4">
+                        <a href="Shortcut-CLI-v3.0.0.zip" class="btn-gradient px-8 py-3.5 rounded-full font-bold text-white shadow-xl shadow-blue-500/20">Download Executable</a>
+                        <a href="https://github.com/torresjchristopher/ScriptCommander-Source" class="text-slate-400 hover:text-white font-semibold flex items-center space-x-2">
+                            <span>Read Documentation</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </a>
+                    </div>
                 </div>
 
-                <!-- One-Line Install -->
-                <div class="pt-10 max-w-xl mx-auto">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">One-Line Dev Install</p>
-                    <div class="bg-black/50 border border-white/10 rounded-xl p-4 flex items-center justify-between group">
-                        <code class="text-blue-400 text-sm">powershell -c "irm https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Source/main/Setup-Shortcut.ps1 | iex"</code>
-                        <button onclick="navigator.clipboard.writeText('powershell -c \"irm https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Source/main/Setup-Shortcut.ps1 | iex\"')" class="text-[10px] font-bold text-slate-500 hover:text-white uppercase px-3 py-1 bg-white/5 rounded">Copy</button>
+                <!-- Visual Terminal Mockup -->
+                <div class="lg:w-1/2 w-full">
+                    <div class="terminal-block rounded-xl overflow-hidden">
+                        <div class="bg-white/[0.03] px-4 py-3 flex items-center justify-between border-b border-white/[0.05]">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-white/10"></div>
+                                <div class="w-3 h-3 rounded-full bg-white/10"></div>
+                                <div class="w-3 h-3 rounded-full bg-white/10"></div>
+                            </div>
+                            <span class="text-[10px] mono text-slate-500 uppercase tracking-widest">shortcut --tui</span>
+                        </div>
+                        <div class="p-8 font-mono text-sm space-y-4 min-h-[300px]">
+                            <div class="text-blue-500 font-bold">$ shortcut list</div>
+                            <div class="grid grid-cols-2 gap-4 text-slate-400">
+                                <div>[01] sys_audit.ps1</div>
+                                <div class="text-emerald-500/80">Verified</div>
+                                <div>[02] net_reset.py</div>
+                                <div class="text-emerald-500/80">Verified</div>
+                                <div>[03] docker_purge.ps1</div>
+                                <div class="text-slate-600">Local</div>
+                            </div>
+                            <div class="pt-6 text-slate-500 italic">// Use arrows to flip through scripts</div>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: FEATURES -->
+        <div id="features" class="tab-content">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Optimized for Productivity.</h2>
+                <p class="text-slate-400">Everything you need to manage local automation at terminal speed.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-[#111] p-8 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all">
+                    <div class="text-blue-500 mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">TUI Navigation</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">A high-speed, interactive terminal interface for flipping through your script library without touching the mouse.</p>
+                </div>
+                <div class="bg-[#111] p-8 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all">
+                    <div class="text-blue-500 mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Recent File Access</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Instantly open your most recently used projects and documents, bypassing the startup menus of heavy desktop applications.</p>
+                </div>
+                <div class="bg-[#111] p-8 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all">
+                    <div class="text-blue-500 mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Quick Explorer</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Navigate your entire filesystem from the terminal with keyboard-only speed. Launch any file with a single keystroke.</p>
+                </div>
+                <div class="bg-[#111] p-8 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all">
+                    <div class="text-blue-500 mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Verified Marketplace</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Integrated access to a curated repository of audited automation scripts, downloaded directly into your isolated environment.</p>
+                </div>
+                <div class="bg-[#111] p-8 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all">
+                    <div class="text-blue-500 mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Security Quarantine</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Automatic heuristic scanning of unverified scripts. Identifies potential risks before they are executed on your hardware.</p>
+                </div>
+                <div class="bg-[#111] p-8 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-all">
+                    <div class="text-blue-500 mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Dual-Mode Architecture</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Seamlessly switch between an interactive TUI for discovery and a direct CLI for headless automation and piping.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: TECHNICAL -->
+        <div id="technical" class="tab-content">
+            <div class="max-w-3xl mx-auto border border-white/5 rounded-2xl overflow-hidden bg-[#111]">
+                <div class="px-8 py-6 border-b border-white/5 flex justify-between items-center">
+                    <h3 class="font-bold text-white">System Architecture</h3>
+                    <span class="text-[10px] mono text-blue-500 font-bold uppercase tracking-widest">Specifications</span>
+                </div>
+                <div class="p-8 space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Core Runtime</h4>
+                            <p class="text-slate-300 text-sm">Python 3.11+ / PowerShell Core (5.1+ Support)</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[11px] font-bold text-slate-500 uppercase mb-3">TUI Framework</h4>
+                            <p class="text-slate-300 text-sm">Rich Text Interface with MSVCRT Navigation</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Execution Security</h4>
+                            <p class="text-slate-300 text-sm">Dynamic Scoped Execution Policy (Bypass Scoped)</p>
+                        </div>
+                        <div>
+                            <h4 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Distribution</h4>
+                            <p class="text-slate-300 text-sm">PyInstaller Standalone Binary (.EXE) with embedded metadata</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: PRIVACY -->
+        <div id="privacy" class="tab-content">
+            <div class="max-w-4xl mx-auto space-y-16">
+                <div class="text-center space-y-4">
+                    <h2 class="text-4xl font-extrabold text-white">Data Sovereignty by Design.</h2>
+                    <p class="text-slate-400">Shortcut CLI is engineered to be invisible to your data. We do not want your information.</p>
                 </div>
                 
-                <!-- CLI Preview Mockup -->
-                <div class="mt-20 glass rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                    <div class="bg-white/5 px-4 py-2 flex items-center space-x-2 border-b border-white/5">
-                        <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-                        <div class="text-[10px] text-slate-500 font-mono pl-4">shortcut --tui</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="space-y-4">
+                        <h4 class="text-white font-bold text-lg">Local-Only Execution</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">All scripts, file histories, and recent document caches are read directly from your filesystem and exist only in volatile memory during runtime. No local data is ever mirrored to a remote database.</p>
                     </div>
-                    <div class="p-8 text-left font-mono text-sm space-y-4">
-                        <div class="text-blue-400 font-bold uppercase tracking-widest text-xs">>>> Shortcut CLI Dashboard</div>
-                        <div class="flex space-x-4">
-                            <div class="w-1/3 space-y-2 border-r border-white/5 pr-4">
-                                <div class="bg-blue-500/20 text-blue-300 p-2 rounded border border-blue-500/30">> Local Scripts</div>
-                                <div class="p-2 text-slate-500 hover:text-slate-300 transition">Marketplace</div>
-                                <div class="p-2 text-slate-500 hover:text-slate-300 transition">Quick Explorer</div>
-                                <div class="p-2 text-slate-500 hover:text-slate-300 transition">Recent Files</div>
-                            </div>
-                            <div class="w-2/3 space-y-3">
-                                <div class="bg-slate-900 p-4 rounded-lg border border-white/5 flex justify-between">
-                                    <span class="text-emerald-400">[VERIFIED]</span> <span>System_Optimizer.ps1</span>
-                                    <span class="text-slate-600">Enter to Run</span>
-                                </div>
-                                <div class="bg-slate-900 p-4 rounded-lg border border-white/5 flex justify-between">
-                                    <span class="text-emerald-400">[VERIFIED]</span> <span>Markdown_Converter.py</span>
-                                    <span class="text-slate-600">Enter to Run</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="space-y-4">
+                        <h4 class="text-white font-bold text-lg">Zero Telemetry Architecture</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Shortcut CLI contains no analytics engines, no tracking pixels, and no "call home" functions. We do not track usage patterns, execution counts, or user identities.</p>
                     </div>
+                    <div class="space-y-4">
+                        <h4 class="text-white font-bold text-lg">Identity-Free Workflow</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">There are no user accounts, no email signups, and no authentication requirements. Your identity is never linked to the software, ensuring total anonymity in your automation tasks.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="text-white font-bold text-lg">Open-Source Verifiability</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">Every line of Shortcut CLI's source code is publicly auditable. We encourage security researchers to verify our zero-data collection claims directly on GitHub.</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#111] border border-white/5 p-8 rounded-2xl text-center">
+                    <p class="text-slate-400 text-sm italic italic">"Your machine. Your scripts. Your data. Period."</p>
                 </div>
             </div>
         </div>
 
-        <!-- TAB: FEATURES -->
-        <div id="features" class="tab-content">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="feature-card p-8 rounded-2xl border border-white/5 transition-all">
-                    <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">TUI "Flipping"</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Navigate your script library with a high-speed, arrow-key driven interface. No more typing long paths or searching through nested folders.</p>
-                </div>
-                <div class="feature-card p-8 rounded-2xl border border-white/5 transition-all">
-                    <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Recent Files</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">One-click access to your most recently used docs and projects. Bypasses the "Open" menus of heavy applications like Word or Photoshop.</p>
-                </div>
-                <div class="feature-card p-8 rounded-2xl border border-white/5 transition-all">
-                    <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Quick Explorer</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">A lightning-fast alternative to Windows Explorer. Navigate your entire drive with keyboard-only speed and instant file launching.</p>
-                </div>
-                <div class="feature-card p-8 rounded-2xl border border-white/5 transition-all">
-                    <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Global Search</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Search billions of lines of code for the perfect automation script. Integrated quarantine system keeps your local system safe.</p>
-                </div>
-                <div class="feature-card p-8 rounded-2xl border border-white/5 transition-all">
-                    <div class="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Dual-Mode Engine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Use the interactive TUI for exploration or the direct CLI for headless automation. The power is in your commands.</p>
-                </div>
-                <div class="feature-card p-8 rounded-2xl border border-white/5 transition-all">
-                    <div class="w-12 h-12 bg-pink-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Secure Quarantine</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Automatic safety scanning for unverified scripts. Identifies dangerous commands before they ever touch your hardware.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB: TECHNICAL -->
-        <div id="technical" class="tab-content">
-            <div class="max-w-3xl mx-auto glass rounded-3xl overflow-hidden border border-white/10">
-                <table class="w-full text-left">
-                    <tr class="border-b border-white/5">
-                        <td class="p-6 font-bold text-slate-500 uppercase text-xs tracking-widest">Engine</td>
-                        <td class="p-6 font-mono text-blue-400">Python 3.11+ / Rich TUI Engine</td>
-                    </tr>
-                    <tr class="border-b border-white/5">
-                        <td class="p-6 font-bold text-slate-500 uppercase text-xs tracking-widest">Dependencies</td>
-                        <td class="p-6 text-slate-300">rich, click, requests, pillow, msvcrt</td>
-                    </tr>
-                    <tr class="border-b border-white/5">
-                        <td class="p-6 font-bold text-slate-500 uppercase text-xs tracking-widest">Security</td>
-                        <td class="p-6 text-slate-300">Heuristic Quarantine Scanner & Bypass-Scoped Execution</td>
-                    </tr>
-                    <tr>
-                        <td class="p-6 font-bold text-slate-500 uppercase text-xs tracking-widest">Packaging</td>
-                        <td class="p-6 text-slate-300">PyInstaller Standalone Binary (.EXE)</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: PRIVACY -->
-        <div id="privacy" class="tab-content">
-            <div class="max-w-2xl mx-auto text-center space-y-12">
-                <div class="space-y-4">
-                    <h2 class="text-5xl font-extrabold tracking-tight">Privacy by Default.</h2>
-                    <p class="text-slate-400">Shortcut CLI is built on the belief that your automation tools should never be a window into your personal data.</p>
-                </div>
-                <div class="grid grid-cols-1 gap-6 text-left">
-                    <div class="glass p-8 rounded-2xl space-y-4 border-l-4 border-emerald-500 shadow-2xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 bg-emerald-500/10 rounded flex items-center justify-center">🛡️</div>
-                            <h4 class="font-bold text-xl">Zero Network Visibility</h4>
-                        </div>
-                        <p class="text-slate-400 leading-relaxed">Shortcut has no "home server." We don't track what you run, what files you open, or how often you use the app. There is no telemetry, no analytics, and no pings to any cloud service.</p>
-                    </div>
-                    <div class="glass p-8 rounded-2xl space-y-4 border-l-4 border-blue-500 shadow-2xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 bg-blue-500/10 rounded flex items-center justify-center">👤</div>
-                            <h4 class="font-bold text-xl">No Accounts, Ever.</h4>
-                        </div>
-                        <p class="text-slate-400 leading-relaxed">We don't want your email address. You don't need a profile to be productive. Shortcut is a "download-and-go" utility that exists entirely on your local machine.</p>
-                    </div>
-                    <div class="glass p-8 rounded-2xl space-y-4 border-l-4 border-purple-500 shadow-2xl">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 bg-purple-500/10 rounded flex items-center justify-center">📂</div>
-                            <h4 class="font-bold text-xl">100% Local Filesystem</h4>
-                        </div>
-                        <p class="text-slate-400 leading-relaxed">Your script library and file history are never synced to a database. Shortcut reads directly from your hardware, ensuring that your workflow remains yours alone.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
 
-    <footer class="max-w-6xl mx-auto px-6 py-20 border-t border-white/5 text-center text-slate-600">
-        <p class="text-sm uppercase tracking-widest font-bold">&copy; 2026 Shortcut CLI. Built for speed. Optimized for privacy.</p>
+    <footer class="border-t border-white/[0.05] py-20 bg-[#0a0a0a]">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-slate-600 text-[11px] font-bold uppercase tracking-[0.2em]">
+            <p>&copy; 2026 Shortcut CLI Project</p>
+            <div class="flex space-x-8 mt-6 md:mt-0">
+                <a href="https://github.com/torresjchristopher/ScriptCommander-Source" class="hover:text-white">GitHub</a>
+                <a href="#" class="hover:text-white">License</a>
+                <a href="#" class="hover:text-white">Support</a>
+            </div>
+        </div>
     </footer>
 
     <script>
@@ -233,6 +258,10 @@
             document.getElementById(tabId).classList.add('active');
             document.getElementById('nav-' + tabId).classList.add('active');
             window.scrollTo(0, 0);
+        }
+        function copyInstall() {
+            navigator.clipboard.writeText('powershell -c "irm shortcut.cli.sh | iex"');
+            alert('Command copied to clipboard!');
         }
     </script>
 </body>
