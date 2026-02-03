@@ -18,39 +18,60 @@ console = Console()
 
 @click.group()
 def main():
-    """Shortcut CLI: The high-speed companion to the Shortcut TUI."""
+    """Shortcut CLI: Container orchestration + Script management + Automation."""
     for d in [SCRIPTS_DIR, QUARANTINE_DIR]:
         if not os.path.exists(d): os.makedirs(d)
 
-@main.command()
-def list():
+
+# ─────────────────────────────────────────────────────────────
+# FORGE INTEGRATION (Container Orchestration + Workflows)
+# ─────────────────────────────────────────────────────────────
+
+try:
+    from forge_integration import attach_forge_commands
+    attach_forge_commands(main)
+except ImportError:
+    console.print("[yellow]Note: Forge integration not available[/yellow]")
+
+
+# ─────────────────────────────────────────────────────────────
+# SCRIPTS GROUP (Local Script Management)
+# ─────────────────────────────────────────────────────────────
+
+@main.group(name='scripts')
+def scripts():
+    """Manage local scripts and automations."""
+    pass
+
+
+@scripts.command(name='list')
+def scripts_list():
     """List all local and quarantined scripts."""
-    scripts = []
+    scripts_list_items = []
     if os.path.exists(SCRIPTS_DIR):
         for f in os.listdir(SCRIPTS_DIR):
-            if f.endswith((".ps1", ".py")): scripts.append((f, "Verified"))
+            if f.endswith((".ps1", ".py")): scripts_list_items.append((f, "Verified"))
     if os.path.exists(QUARANTINE_DIR):
         for f in os.listdir(QUARANTINE_DIR):
-            if f.endswith((".ps1", ".py")): scripts.append((f, "QUARANTINE"))
+            if f.endswith((".ps1", ".py")): scripts_list_items.append((f, "QUARANTINE"))
     
     table = Table(title="Local Scripts", border_style="blue")
     table.add_column("ID", justify="right", style="cyan")
     table.add_column("Filename", style="white")
     table.add_column("Status", style="green")
 
-    for i, (f, status) in enumerate(scripts):
+    for i, (f, status) in enumerate(scripts_list_items):
         style = "bold red" if status == "QUARANTINE" else "dim"
         table.add_row(str(i+1), f, status, style=style)
     
     console.print(table)
 
-@main.command()
+
+@scripts.command(name='search')
 @click.argument('query')
-def search(query):
+def scripts_search(query):
     """Search GitHub for automation scripts (QUARANTINE MODE)."""
     console.print(f"[cyan]Searching GitHub for: {query}...[/cyan]")
-    # Using GitHub search API for code/files
-    # Note: We filter for .ps1 and .py
     url = f"https://api.github.com/search/code?q={query}+extension:ps1+extension:py"
     try:
         headers = {'Accept': 'application/vnd.github.v3+json'}
@@ -86,23 +107,24 @@ def search(query):
             res = requests.get(selected['url'])
             with open(target, 'wb') as f:
                 f.write(res.content)
-            console.print(f"[bold green]Saved to Quarantine.[/bold green] Use 'shortcut run' or the TUI to execute.")
+            console.print(f"[bold green]Saved to Quarantine.[/bold green] Use 'shortcut scripts run' to execute.")
             
     except Exception as e:
         console.print(f"[red]GitHub Search Error: {e}[/red]")
 
-@main.command()
+
+@scripts.command(name='run')
 @click.argument('script_id', type=int)
-def run(script_id):
+def scripts_run(script_id):
     """Run a script by its ID from the list."""
-    scripts = []
+    scripts_list_items = []
     for d in [SCRIPTS_DIR, QUARANTINE_DIR]:
         if os.path.exists(d):
             for f in os.listdir(d):
-                if f.endswith((".ps1", ".py")): scripts.append(os.path.join(d, f))
+                if f.endswith((".ps1", ".py")): scripts_list_items.append(os.path.join(d, f))
     
-    if 0 < script_id <= len(scripts):
-        script_path = scripts[script_id - 1]
+    if 0 < script_id <= len(scripts_list_items):
+        script_path = scripts_list_items[script_id - 1]
         filename = os.path.basename(script_path)
         
         if "quarantine" in script_path.lower():
@@ -118,6 +140,44 @@ def run(script_id):
         else: console.print("[bold green]✓ Success[/bold green]")
     else:
         console.print("[red]Invalid Script ID.[/red]")
+
+
+# ─────────────────────────────────────────────────────────────
+# FEATURES GROUP (Additional Features & Administration)
+# ─────────────────────────────────────────────────────────────
+
+@main.group(name='features')
+def features():
+    """Additional features and administration."""
+    pass
+
+
+@features.command(name='help')
+def features_help():
+    """Show help and documentation."""
+    console.print(Panel("""[bold cyan]Shortcut CLI - Help[/bold cyan]
+
+[bold]Usage:[/bold]
+  shortcut [COMMAND] [OPTIONS]
+
+[bold]Command Groups:[/bold]
+  forge              Container orchestration + workflows
+  scripts            Local script management  
+  features           Additional features & administration
+
+[bold]Examples:[/bold]
+  shortcut forge tui                    # Launch Forge dashboard
+  shortcut forge container run IMAGE    # Run a container
+  shortcut forge workflow run WF         # Execute workflow
+  
+  shortcut scripts list                 # List scripts
+  shortcut scripts run 1                # Run script #1
+  shortcut scripts search KEYWORD       # Search GitHub
+
+[bold]For more info:[/bold]
+  shortcut [GROUP] --help
+""", border_style="cyan"))
+
 
 if __name__ == "__main__":
     main()
