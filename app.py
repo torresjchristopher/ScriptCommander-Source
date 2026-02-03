@@ -24,6 +24,10 @@ class ScriptCommanderApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        # Cache & Performance
+        self._market_cache = None
+        self._scripts_cache = {}
+
         # Window Setup
         self.title(f"{APP_NAME} v{VERSION}")
         self.geometry("900x650")
@@ -49,6 +53,7 @@ class ScriptCommanderApp(ctk.CTk):
 
         self.btn_local = self.create_sidebar_button("My Scripts", self.show_local_scripts)
         self.btn_market = self.create_sidebar_button("Marketplace", self.show_marketplace)
+        self.btn_cli = self.create_sidebar_button("CLI Guide", self.show_cli_guide)
         self.btn_settings = self.create_sidebar_button("Settings", self.show_settings)
 
         # Main Content Area
@@ -96,9 +101,10 @@ class ScriptCommanderApp(ctk.CTk):
 
     def filter_scripts(self):
         query = self.search_var.get().lower()
-        if self.view_title.cget("text") == "My Scripts":
+        vt = self.view_title.cget("text")
+        if vt == "My Scripts":
             self.load_scripts(query)
-        elif "Marketplace" in self.view_title.cget("text"):
+        elif vt == "Official Marketplace":
             self.show_marketplace(query)
 
     def show_local_scripts(self):
@@ -107,8 +113,12 @@ class ScriptCommanderApp(ctk.CTk):
 
     def show_marketplace(self, query=""):
         self.view_title.configure(text="Official Marketplace")
-        self.clear_view()
         
+        if not query and self._market_cache:
+            self.render_marketplace(self._market_cache)
+            return
+
+        self.clear_view()
         sec_frame = ctk.CTkFrame(self.scroll_frame, fg_color="#064e3b", corner_radius=8)
         sec_frame.pack(fill="x", pady=(0, 15), padx=5)
         sec_lbl = ctk.CTkLabel(sec_frame, text="🛡️ All scripts in this marketplace have been manually audited for security.", 
@@ -122,6 +132,7 @@ class ScriptCommanderApp(ctk.CTk):
                 response = requests.get(MARKETPLACE_URL, timeout=10)
                 response.raise_for_status()
                 items = response.json()
+                self._market_cache = items
                 if query:
                     items = [i for i in items if query in i["name"].lower() or query in i["description"].lower()]
                 self.after(0, lambda: self.render_marketplace(items))
@@ -129,6 +140,37 @@ class ScriptCommanderApp(ctk.CTk):
                 self.after(0, lambda: self.show_error(f"Marketplace Error: {e}"))
 
         threading.Thread(target=fetch_market, daemon=True).start()
+
+    def show_cli_guide(self):
+        self.view_title.configure(text="CLI Guide")
+        self.clear_view()
+        
+        guide_text = (
+            "Script Commander includes a powerful Command Line Interface (CLI) "
+            "for headless execution and automation.\n\n"
+            "How to use the CLI:\n"
+            "-------------------\n"
+            "1. Open Terminal/PowerShell in the app directory.\n"
+            "2. Run the following commands:\n\n"
+            "   List local scripts:\n"
+            "   > python app.py --list\n\n"
+            "   Browse Marketplace:\n"
+            "   > python app.py --market\n\n"
+            "   Navigate pages:\n"
+            "   > python app.py --market --page 2\n\n"
+            "Advanced Usage:\n"
+            "---------------\n"
+            "The CLI is built directly into the main executable. If you are using "
+            "the bundled .exe, you can run:\n"
+            "   > ./ScriptCommander.exe --list"
+        )
+        
+        card = ctk.CTkFrame(self.scroll_frame, fg_color=CARD_BG, corner_radius=12)
+        card.pack(fill="both", expand=True, padx=5, pady=5)
+        
+        lbl = ctk.CTkLabel(card, text=guide_text, justify="left", font=ctk.CTkFont(family="Consolas", size=13),
+                           padx=20, pady=20)
+        lbl.pack(fill="both")
 
     def render_marketplace(self, items):
         self.clear_view()
@@ -304,7 +346,50 @@ class ScriptCommanderApp(ctk.CTk):
 
         threading.Thread(target=execute, daemon=True).start()
 
+def run_cli():
+    import argparse
+    parser = argparse.ArgumentParser(description="Script Commander CLI")
+    parser.add_argument("--list", action="store_true", help="List local scripts")
+    parser.add_argument("--market", action="store_true", help="List marketplace scripts")
+    parser.add_argument("--page", type=int, default=1, help="Page number (10 items per page)")
+    args = parser.parse_args()
+
+    PAGE_SIZE = 10
+    start_idx = (args.page - 1) * PAGE_SIZE
+    end_idx = start_idx + PAGE_SIZE
+
+    if args.list:
+        if not os.path.exists(SCRIPTS_DIR):
+            print("No scripts directory found.")
+            return
+        files = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".ps1") or f.endswith(".py")]
+        print(f"\n--- Local Scripts (Page {args.page}) ---")
+        for f in files[start_idx:end_idx]:
+            print(f"- {f}")
+        if len(files) > end_idx:
+            print(f"\nUse --page {args.page + 1} to see more.")
+    
+    elif args.market:
+        print("Fetching marketplace...")
+        try:
+            response = requests.get(MARKETPLACE_URL, timeout=10)
+            response.raise_for_status()
+            items = response.json()
+            print(f"\n--- Official Marketplace (Page {args.page}) ---")
+            for item in items[start_idx:end_idx]:
+                v = "[VERIFIED] " if item.get("verified") else ""
+                print(f"- {v}{item['name']}: {item['description'][:60]}...")
+            if len(items) > end_idx:
+                print(f"\nUse --page {args.page + 1} to see more.")
+        except Exception as e:
+            print(f"Error: {e}")
+    else:
+        parser.print_help()
+
 if __name__ == "__main__":
-    ctk.set_appearance_mode("Dark")
-    app = ScriptCommanderApp()
-    app.mainloop()
+    if len(sys.argv) > 1:
+        run_cli()
+    else:
+        ctk.set_appearance_mode("Dark")
+        app = ScriptCommanderApp()
+        app.mainloop()
