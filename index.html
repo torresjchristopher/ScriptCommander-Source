@@ -27,6 +27,7 @@
         </div>
         <div class="flex space-x-10 font-semibold text-sm uppercase tracking-widest">
             <button onclick="showTab('home')" id="nav-home" class="nav-link active pb-1 transition hover:text-blue-400">Home</button>
+            <button onclick="showTab('forge')" id="nav-forge" class="nav-link pb-1 transition hover:text-blue-400">Forge</button>
             <button onclick="showTab('features')" id="nav-features" class="nav-link pb-1 transition hover:text-blue-400">Features</button>
             <button onclick="showTab('docs')" id="nav-docs" class="nav-link pb-1 transition hover:text-blue-400">Docs</button>
             <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="pb-1 transition hover:text-blue-400">GitHub</a>
@@ -125,6 +126,89 @@
                     <div class="carousel-dot w-3 h-3 rounded-full bg-slate-600 cursor-pointer transition hover:scale-125" onclick="goToSlide(2)"></div>
                     <div class="carousel-dot w-3 h-3 rounded-full bg-slate-600 cursor-pointer transition hover:scale-125" onclick="goToSlide(3)"></div>
                     <div class="carousel-dot w-3 h-3 rounded-full bg-slate-600 cursor-pointer transition hover:scale-125" onclick="goToSlide(4)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGE TAB -->
+    <div id="forge" class="tab-content py-20">
+        <div class="max-w-6xl mx-auto px-6">
+            <header class="text-center mb-20">
+                <h1 class="text-6xl font-bold mb-6 tracking-tight">⚡ <span class="gradient-text">Forge</span></h1>
+                <p class="text-2xl text-slate-300 mb-4">Lightning-fast Container Orchestration</p>
+                <p class="text-xl text-slate-400">5-10x faster than Docker, 30x leaner than Airflow</p>
+            </header>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+                <div>
+                    <h2 class="text-4xl font-bold mb-6 text-blue-400">Enterprise Performance</h2>
+                    <ul class="space-y-4 text-lg text-slate-300">
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-400 font-bold">✓</span>
+                            <span><strong>245ms startup time</strong> vs 2-5 seconds with Docker</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-400 font-bold">✓</span>
+                            <span><strong>15MB runtime footprint</strong> vs 1GB+ for containers</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-400 font-bold">✓</span>
+                            <span><strong>No daemon required</strong> - direct execution model</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-400 font-bold">✓</span>
+                            <span><strong>Auto-pruning architecture</strong> - smart resource cleanup</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-400 font-bold">✓</span>
+                            <span><strong>Embedded workflows</strong> - no separate Airflow needed</span>
+                        </li>
+                    </ul>
+                    <div class="flex gap-4 mt-10">
+                        <a href="https://yukora.org/forge/" target="_blank" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-lg transition font-semibold">Explore Forge</a>
+                        <a href="https://github.com/torresjchristopher/forge" target="_blank" class="px-8 py-3 border-2 border-blue-500 text-blue-300 hover:bg-blue-500/10 rounded-lg transition font-semibold">GitHub</a>
+                    </div>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-700 p-8 rounded-2xl">
+                    <div class="space-y-6">
+                        <div class="bg-slate-900/80 p-6 rounded-lg border border-blue-500/20">
+                            <div class="text-sm text-slate-400 mb-2">FORGE METRICS</div>
+                            <div class="text-3xl font-bold text-blue-400">245ms</div>
+                            <div class="text-sm text-slate-400">Container startup</div>
+                        </div>
+                        <div class="bg-slate-900/80 p-6 rounded-lg border border-blue-500/20">
+                            <div class="text-sm text-slate-400 mb-2">MEMORY OVERHEAD</div>
+                            <div class="text-3xl font-bold text-blue-400">15MB</div>
+                            <div class="text-sm text-slate-400">vs 1GB+ Docker</div>
+                        </div>
+                        <div class="bg-slate-900/80 p-6 rounded-lg border border-blue-500/20">
+                            <div class="text-sm text-slate-400 mb-2">EFFICIENCY GAIN</div>
+                            <div class="text-3xl font-bold text-blue-400">10x</div>
+                            <div class="text-sm text-slate-400">vs traditional containers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-700 pt-20">
+                <h2 class="text-4xl font-bold mb-12 text-center">Why Forge?</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-slate-900/60 border border-slate-700 p-8 rounded-xl">
+                        <div class="text-4xl mb-4">⚡</div>
+                        <h3 class="text-xl font-bold mb-3">Speed</h3>
+                        <p class="text-slate-400">Snapshot-based orchestration eliminates Docker's layered complexity.</p>
+                    </div>
+                    <div class="bg-slate-900/60 border border-slate-700 p-8 rounded-xl">
+                        <div class="text-4xl mb-4">💾</div>
+                        <h3 class="text-xl font-bold mb-3">Efficiency</h3>
+                        <p class="text-slate-400">15MB runtime + auto-pruning keeps your system lean and responsive.</p>
+                    </div>
+                    <div class="bg-slate-900/60 border border-slate-700 p-8 rounded-xl">
+                        <div class="text-4xl mb-4">🔗</div>
+                        <h3 class="text-xl font-bold mb-3">Integrated</h3>
+                        <p class="text-slate-400">Embedded workflows mean no separate Airflow—everything in one place.</p>
+                    </div>
                 </div>
             </div>
         </div>
