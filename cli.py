@@ -9,6 +9,8 @@ from rich.panel import Panel
 
 from artifact_sync import ArtifactSync, get_auth_token, save_auth_token
 from keycard_manager import KeycardManager
+from pidgeon import Pidgeon
+from connect import Connect
 
 # Shared Configuration
 APP_NAME = "Shortcut CLI"
@@ -29,37 +31,65 @@ def main():
 
 
 # ─────────────────────────────────────────────────────────────
-# KEYCARD GROUP (State Restoration)
+# PIDGEON GROUP (Email & Contacts)
 # ─────────────────────────────────────────────────────────────
 
-@main.group(name='keycard')
-def keycard():
-    """Amass and decipher context codes to restore work."""
+@main.group(name='pidgeon')
+def pidgeon():
+    """Email and contact management from the command line."""
     pass
 
-@keycard.command(name='register')
-@click.argument('code')
-def keycard_register(code):
-    """Register a keycard code string."""
-    mgr = KeycardManager()
-    if mgr.register_code(code):
-        console.print("[bold green]✓ Keycard registered and deciphered.[/bold green]")
+@pidgeon.command(name='send')
+@click.argument('to')
+@click.option('--subject', '-s', required=True)
+@click.option('--body', '-b', required=True)
+def pidgeon_send(to, subject, body):
+    """Send a Pidgeon (email)."""
+    p = Pidgeon()
+    p.send_pidgeon(to, subject, body)
 
-@keycard.command(name='list')
-def keycard_list():
-    """List all available restores."""
-    mgr = KeycardManager()
-    restores = mgr.get_all_restores()
-    
-    table = Table(title="Restore Windows", border_style="cyan")
-    table.add_column("ID", style="white")
-    table.add_column("Type", style="blue")
-    table.add_column("Context", style="green")
-
-    for r in restores:
-        table.add_row(r['id'], r['type'], r.get('name', 'N/A'))
-    
+@pidgeon.command(name='contacts')
+def pidgeon_contacts():
+    """List recent contacts."""
+    p = Pidgeon()
+    contacts = p.get_contacts()
+    table = Table(title="Recent Contacts")
+    table.add_column("Name", style="cyan")
+    table.add_column("Email", style="green")
+    for c in contacts:
+        table.add_row(c['name'], c['email'])
     console.print(table)
+
+
+# ─────────────────────────────────────────────────────────────
+# CONNECT GROUP (Collaboration & Messaging)
+# ─────────────────────────────────────────────────────────────
+
+@main.group(name='connect')
+def connect():
+    """Collaborate with other Nexus users."""
+    pass
+
+@connect.command(name='peers')
+def connect_peers():
+    """Discover online peers."""
+    c = Connect()
+    peers = c.get_online_peers()
+    table = Table(title="Online Nexus Users")
+    table.add_column("User", style="bold cyan")
+    table.add_column("Status", style="yellow")
+    table.add_column("IP", style="dim")
+    for p in peers:
+        table.add_row(p['username'], p['status'], p['ip'])
+    console.print(table)
+
+@connect.command(name='msg')
+@click.argument('user')
+@click.argument('text')
+def connect_msg(user, text):
+    """Send a direct message."""
+    c = Connect()
+    c.send_message(user, text)
 
 
 # ─────────────────────────────────────────────────────────────
