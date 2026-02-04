@@ -19,7 +19,7 @@ from datetime import datetime
 
 # Configuration
 APP_NAME = "Shortcut CLI"
-VERSION = "3.2.0"
+VERSION = "4.0.2"
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
 QUARANTINE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "quarantine")
 MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json"
@@ -29,23 +29,22 @@ console = Console()
 
 class ShortcutTUI:
     def __init__(self):
-        # Top-level menu aligned with CLI structure
+        # Refactored menu per Automation OS design
         self.menu_options = [
+            "Keycard (State Restoration)", 
             "Forge (Container Orchestration)", 
-            "Scripts (Automation)", 
-            "Omni-Sync (Repo Orchestration)",
-            "Features (Utilities)", 
+            "Local Scripts (Automation)", 
+            "Additional Features (Utilities)", 
             "Exit"
         ]
         
         # Sub-menus
-        self.forge_options = ["Launch Dashboard (TUI)", "System Status", "Benchmark Startup", "Back"]
-        self.scripts_options = ["Local Scripts", "Marketplace", "GitHub Search", "Back"]
-        self.sync_options = ["Sync GitHub Repo", "Manage Auth (VaultZero)", "Back"]
-        self.features_options = ["Workspaces (Morning Routine)", "Comms Hub", "Quick Explorer", "Recent Files", "Back"]
+        self.forge_options = ["Launch Dashboard (TUI)", "System Status", "Sync GitHub Repo (Omni-Sync)", "Back"]
+        self.scripts_options = ["My Verified Scripts", "Marketplace", "GitHub Search", "Back"]
+        self.features_options = ["Workspaces (Morning Routine)", "Comms Hub", "Quick Explorer", "Recent Files", "Manage Vault (VaultZero)", "Back"]
 
         self.current_index = 0
-        self.state = "MENU" # MENU, FORGE_MENU, SCRIPTS_MENU, SYNC_MENU, FEATURES_MENU, SCRIPTS_LIST, MARKET, SEARCH, RECENT, EXPLORER
+        self.state = "MENU" # MENU, KEYCARD_LIST, FORGE_MENU, SCRIPTS_MENU, FEATURES_MENU, SCRIPTS_LIST, MARKET, SEARCH, RECENT, EXPLORER
         self.items = []
         self.sub_index = 0
         self.current_path = os.path.expanduser("~") # For Explorer
@@ -68,6 +67,14 @@ class ShortcutTUI:
                 if f.endswith(".ps1") or f.endswith(".py"):
                     scripts.append({"name": f, "path": os.path.join(QUARANTINE_DIR, f), "status": "QUARANTINE"})
         return scripts
+
+    def get_keycard_restores(self):
+        try:
+            from keycard_manager import KeycardManager
+            mgr = KeycardManager()
+            return mgr.get_all_restores()
+        except:
+            return []
 
     def get_marketplace(self):
         try:
@@ -173,7 +180,7 @@ class ShortcutTUI:
 
         console.clear()
         syntax = Syntax(content, "python" if item['name'].endswith(".py") else "powershell", theme="monokai", line_numbers=True)
-        console.print(Panel(syntax, title=f"[bold]Preview: {item['name']}[/bold]", border_style="blue"))
+        console.print(Panel(syntax, title=f"[bold]Preview: {item['name']}[/bold]", border_style="blue")
         console.input("\n[dim]Press Enter to return...[/dim]")
 
     def run_script(self, item):
@@ -214,22 +221,27 @@ class ShortcutTUI:
 
     def get_current_options(self):
         if self.state == "MENU": return self.menu_options
+        if self.state == "KEYCARD_LIST": return [] # dynamic
         if self.state == "FORGE_MENU": return self.forge_options
         if self.state == "SCRIPTS_MENU": return self.scripts_options
-        if self.state == "SYNC_MENU": return self.sync_options
         if self.state == "FEATURES_MENU": return self.features_options
         return []
 
     def main_loop(self):
+        try:
+            from forge_integration import launch_forge_command
+        except ImportError:
+            launch_forge_command = None
+
         with Live(refresh_per_second=10, screen=True) as live:
             while self.running:
                 # DRAWING
                 if self.state == "MENU": live.update(self.draw_menu(self.menu_options))
-                elif self.state == "FORGE_MENU": live.update(self.draw_menu(self.forge_options, title_override="Forge Menu"))
-                elif self.state == "SCRIPTS_MENU": live.update(self.draw_menu(self.scripts_options, title_override="Scripts Menu"))
-                elif self.state == "SYNC_MENU": live.update(self.draw_menu(self.sync_options, title_override="Omni-Sync Menu"))
-                elif self.state == "FEATURES_MENU": live.update(self.draw_menu(self.features_options, title_override="Features Menu"))
+                elif self.state == "FORGE_MENU": live.update(self.draw_menu(self.forge_options, title_override="Forge Engine"))
+                elif self.state == "SCRIPTS_MENU": live.update(self.draw_menu(self.scripts_options, title_override="Local Scripts"))
+                elif self.state == "FEATURES_MENU": live.update(self.draw_menu(self.features_options, title_override="Additional Features"))
                 
+                elif self.state == "KEYCARD_LIST": live.update(self.draw_list("Keycard: Restore Windows", self.items, self.sub_index))
                 elif self.state == "SCRIPTS_LIST": live.update(self.draw_list("My Scripts", self.items, self.sub_index))
                 elif self.state == "MARKET": live.update(self.draw_list("Verified Marketplace", self.items, self.sub_index, True))
                 elif self.state == "SEARCH": live.update(self.draw_list("GitHub Global Search", self.items, self.sub_index))
@@ -251,12 +263,18 @@ class ShortcutTUI:
                     elif key == 13: # Enter
                         if self.state == "MENU":
                             choice = self.menu_options[self.current_index]
-                            if "Forge" in choice: self.state = "FORGE_MENU"; self.current_index = 0
+                            if "Keycard" in choice: self.state = "KEYCARD_LIST"; self.items = self.get_keycard_restores(); self.sub_index = 0
+                            elif "Forge" in choice: self.state = "FORGE_MENU"; self.current_index = 0
                             elif "Scripts" in choice: self.state = "SCRIPTS_MENU"; self.current_index = 0
-                            elif "Omni-Sync" in choice: self.state = "SYNC_MENU"; self.current_index = 0
                             elif "Features" in choice: self.state = "FEATURES_MENU"; self.current_index = 0
                             elif "Exit" in choice: self.running = False
                         
+                        elif self.state == "KEYCARD_LIST":
+                            if self.items:
+                                restore = self.items[self.sub_index]
+                                live.stop(); console.print(f"[cyan]Applying restore: {restore.get('id')}...[/cyan]")
+                                console.input("\nPress Enter to return..."); live.start()
+
                         elif self.state == "FORGE_MENU":
                             choice = self.forge_options[self.current_index]
                             if "Dashboard" in choice:
@@ -267,35 +285,22 @@ class ShortcutTUI:
                             elif "System Status" in choice:
                                 if launch_forge_command:
                                     live.stop(); launch_forge_command(['system', 'usage']); console.input("\nPress Enter..."); live.start()
-                            elif "Benchmark" in choice:
-                                if launch_forge_command:
-                                    live.stop(); launch_forge_command(['benchmark', 'startup']); console.input("\nPress Enter..."); live.start()
-                            elif "Back" in choice: self.state = "MENU"; self.current_index = 0
-
-                        elif self.state == "SCRIPTS_MENU":
-                            choice = self.scripts_options[self.current_index]
-                            if "Local Scripts" in choice: self.state = "SCRIPTS_LIST"; self.items = self.get_local_scripts(); self.sub_index = 0
-                            elif "Marketplace" in choice: self.state = "MARKET"; self.items = self.get_marketplace(); self.sub_index = 0
-                            elif "GitHub Search" in choice:
-                                live.stop()
-                                q = console.input("[bold cyan]GitHub Search Query: [/bold cyan]")
-                                self.items = self.search_github(q); self.state = "SEARCH"; self.sub_index = 0
-                                live.start()
-                            elif "Back" in choice: self.state = "MENU"; self.current_index = 0
-
-                        elif self.state == "SYNC_MENU":
-                            choice = self.sync_options[self.current_index]
-                            if "Sync GitHub Repo" in choice:
+                            elif "Sync GitHub" in choice:
                                 live.stop()
                                 repo = console.input("[bold cyan]Repo Name (user/repo): [/bold cyan]")
                                 subprocess.run([sys.executable, "cli.py", "sync", "repo", repo])
                                 console.input("\nPress Enter...")
                                 live.start()
-                            elif "Manage Auth" in choice:
+                            elif "Back" in choice: self.state = "MENU"; self.current_index = 0
+
+                        elif self.state == "SCRIPTS_MENU":
+                            choice = self.scripts_options[self.current_index]
+                            if "My Verified" in choice: self.state = "SCRIPTS_LIST"; self.items = self.get_local_scripts(); self.sub_index = 0
+                            elif "Marketplace" in choice: self.state = "MARKET"; self.items = self.get_marketplace(); self.sub_index = 0
+                            elif "GitHub Search" in choice:
                                 live.stop()
-                                token = console.input("[bold cyan]GitHub Token: [/bold cyan]")
-                                subprocess.run([sys.executable, "cli.py", "vault", "login", token])
-                                console.input("\nPress Enter...")
+                                q = console.input("[bold cyan]GitHub Search Query: [/bold cyan]")
+                                self.items = self.search_github(q); self.state = "SEARCH"; self.sub_index = 0
                                 live.start()
                             elif "Back" in choice: self.state = "MENU"; self.current_index = 0
 
@@ -307,6 +312,12 @@ class ShortcutTUI:
                                 live.stop(); subprocess.run([sys.executable, os.path.join(SCRIPTS_DIR, "comms-hub.py")]); live.start()
                             elif "Quick Explorer" in choice: self.state = "EXPLORER"; self.items = self.get_explorer_items(); self.sub_index = 0
                             elif "Recent Files" in choice: self.state = "RECENT"; self.items = self.get_recent_files(); self.sub_index = 0
+                            elif "Manage Vault" in choice:
+                                live.stop()
+                                token = console.input("[bold cyan]GitHub Token: [/bold cyan]")
+                                subprocess.run([sys.executable, "cli.py", "vault", "login", token])
+                                console.input("\nPress Enter...")
+                                live.start()
                             elif "Back" in choice: self.state = "MENU"; self.current_index = 0
 
                         elif self.state == "SCRIPTS_LIST":
@@ -334,6 +345,7 @@ class ShortcutTUI:
                              # Return to appropriate submenu
                              if self.state in ["SCRIPTS_LIST", "MARKET", "SEARCH"]: self.state = "SCRIPTS_MENU"
                              elif self.state in ["EXPLORER", "RECENT"]: self.state = "FEATURES_MENU"
+                             elif self.state == "KEYCARD_LIST": self.state = "MENU"
                              else: self.state = "MENU"
                              self.current_index = 0
 
