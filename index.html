@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shortcut CLI v4.0 | Unified Automation & Orchestration</title>
+    <title>Shortcut CLI v4.1 | High-Caliber Automation OS</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -34,9 +34,11 @@
         .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
         @keyframes pulse-slow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
         .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
+        .spec-label { color: #64748b; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; }
+        .spec-value { color: #f1f5f9; font-size: 1rem; font-weight: 800; }
     </style>
 </head>
-<body class="antialiased selection:bg-blue-500/30">
+<body class="antialiased selection:bg-blue-500/30 text-slate-200">
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
         <div class="max-w-7xl mx-auto px-8 h-20 flex justify-between items-center">
@@ -49,7 +51,7 @@
             <div class="hidden md:flex space-x-8 font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400">
                 <button onclick="showTab('home')" id="nav-home" class="nav-link active pb-1 transition hover:text-blue-400">Home</button>
                 <button onclick="showTab('forge')" id="nav-forge" class="nav-link pb-1 transition hover:text-blue-400">Forge Engine</button>
-                <button onclick="showTab('sync')" id="nav-sync" class="nav-link pb-1 transition hover:text-blue-400 text-emerald-400">Omni-Sync</button>
+                <button onclick="showTab('nexus')" id="nav-nexus" class="nav-link pb-1 transition hover:text-yellow-400">Nexus OS</button>
                 <button onclick="showTab('features')" id="nav-features" class="nav-link pb-1 transition hover:text-blue-400">Features</button>
                 <button onclick="showTab('docs')" id="nav-docs" class="nav-link pb-1 transition hover:text-blue-400">Docs</button>
                 <button onclick="showTab('download')" id="nav-download" class="nav-link pb-1 transition hover:text-white border border-white/10 px-3 rounded-full">Download</button>
@@ -63,47 +65,46 @@
         
         <!-- HOME TAB -->
         <div id="home" class="tab-content active">
-            <div class="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden">
+            <div class="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden px-8">
                 <div class="absolute inset-0 z-0">
                     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
-                    <div class="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 2s"></div>
                 </div>
                 
-                <div class="carousel-container relative z-10 w-full max-w-5xl mx-auto px-6 h-[600px]">
+                <div class="carousel-container relative z-10 w-full max-w-5xl mx-auto h-[600px]">
                     <!-- Slide 1: Shortcut CLI -->
                     <div class="carousel-slide active absolute inset-0 flex flex-col items-center justify-center text-center">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-8">
-                            New Release v4.0.2
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-8 italic">
+                            High-Caliber Release v4.1.0
                         </div>
-                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tight leading-tight italic">Automation. <br/><span class="gradient-text text-normal">Simplified.</span></h2>
-                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-medium">Unified platform for container orchestration, repo orchestration, and script management. One binary. Zero dependencies.</p>
+                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tight leading-tight italic">Automation. <br/><span class="gradient-text">Redefined.</span></h2>
+                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-medium italic">Unified platform for container orchestration, repo orchestration, and script management. Integrated natively with Nexus OS.</p>
                         <div class="flex flex-col md:flex-row gap-4 items-center">
                             <div class="bg-slate-900/80 backdrop-blur border border-white/10 px-6 py-4 rounded-2xl font-mono text-sm text-blue-300 cursor-pointer hover:border-blue-400 transition group relative" onclick="copyCmd(this, 'irm shortcut.cli.sh | iex')">
                                 <span class="text-slate-500 mr-2">$</span> irm shortcut.cli.sh | iex
                                 <span class="copy-feedback hidden absolute -top-10 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">COPIED!</span>
                             </div>
-                            <button onclick="showTab('features')" class="px-8 py-4 bg-white text-slate-950 rounded-2xl font-extrabold hover:scale-105 transition-all shadow-xl shadow-white/10">EXPLORE TOOLS</button>
+                            <button onclick="showTab('download')" class="px-8 py-4 bg-white text-slate-950 rounded-2xl font-extrabold hover:scale-105 transition-all shadow-xl shadow-white/10 uppercase tracking-tighter">GET STARTED</button>
                         </div>
                     </div>
 
                     <!-- Slide 2: Forge -->
                     <div class="carousel-slide absolute inset-0 flex flex-col items-center justify-center text-center">
-                        <div class="text-sm font-black text-blue-500 uppercase tracking-[0.4em] mb-4 italic">The Forge Engine</div>
-                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter leading-tight italic">50X FASTER <br/>THAN DOCKER.</h2>
-                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">Warmed container startups in &lt;25ms. Integrated Airflow DAGs. Native TUI management.</p>
-                        <button onclick="showTab('forge')" class="px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-blue-500/20">ENTER THE FORGE</button>
+                        <div class="text-sm font-black text-blue-500 uppercase tracking-[0.4em] mb-4 italic">50x Faster than Docker</div>
+                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter leading-tight italic">LIGHTNING IN <br/>A BOX.</h2>
+                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed italic">Warmed startups in &lt;25ms. 12MB runtime footprint. Integrated Airflow DAGs with zero database overhead.</p>
+                        <button onclick="showTab('forge')" class="px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-blue-500/20 italic uppercase tracking-tighter">ENTER THE FORGE</button>
                     </div>
 
-                    <!-- Slide 3: Omni-Sync -->
+                    <!-- Slide 3: Nexus OS -->
                     <div class="carousel-slide absolute inset-0 flex flex-col items-center justify-center text-center">
-                        <div class="text-sm font-black text-emerald-500 uppercase tracking-[0.4em] mb-4 italic">Omni-Sync Technology</div>
-                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter leading-tight italic">REPOS AS <br/>WORKFLOWS.</h2>
-                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-medium">Automatic scaffolding of entire repositories into Forge-ready DAGs. Sync across nodes with VaultZero security.</p>
-                        <button onclick="showTab('sync')" class="px-10 py-5 border-2 border-emerald-500 text-emerald-400 rounded-2xl font-black text-lg hover:bg-emerald-500/10 transition-all">START SYNCING</button>
+                        <div class="text-sm font-black text-yellow-500 uppercase tracking-[0.4em] mb-4 italic">Nexus Automation OS</div>
+                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter leading-tight italic uppercase">REPOS AS <br/><span class="text-yellow-500">WORKFLOWS.</span></h2>
+                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-medium italic">Automatic scaffolding of repositories into Forge-ready local environments. Collaborative P2P sessions via Connect.</p>
+                        <button onclick="showTab('nexus')" class="px-10 py-5 border-2 border-yellow-500 text-yellow-500 rounded-2xl font-black text-lg hover:bg-yellow-500/10 transition-all italic uppercase tracking-tighter">LAUNCH NEXUS</button>
                     </div>
                 </div>
 
-                <!-- Carousel Controls -->
+                <!-- Carousel Dot Progress -->
                 <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4 z-20">
                     <button onclick="goToSlide(0)" class="carousel-dot w-12 h-1 bg-white/10 rounded-full transition-all overflow-hidden relative">
                         <div class="absolute inset-0 bg-blue-500 scale-x-0 origin-left transition-transform duration-[8000ms]" id="dot-progress-0"></div>
@@ -124,21 +125,32 @@
                 <div class="flex flex-col md:flex-row gap-20 items-center mb-40">
                     <div class="flex-1">
                         <div class="text-blue-500 font-black text-xs uppercase tracking-[0.5em] mb-6 italic">Performance Core</div>
-                        <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic">LIGHTNING IN <br/>A BOX.</h2>
-                        <p class="text-lg text-slate-400 mb-10 leading-relaxed font-medium">Forge integrates Airflow-style workflows directly into an unheard-of lightweight container service. It prunes data effectively and runs entirely from a native TUI.</p>
-                        <div class="grid grid-cols-2 gap-6 mb-10">
+                        <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic">THE FORGE <br/>ADVANTAGE.</h2>
+                        <p class="text-lg text-slate-400 mb-10 leading-relaxed font-medium italic">Forge integrates Airflow-style workflows directly into an unheard-of lightweight container service. It prunes data effectively and runs entirely from a native TUI.</p>
+                        
+                        <!-- Mini Benchmarks -->
+                        <div class="grid grid-cols-2 gap-4 mb-10">
                             <div class="glass p-6 rounded-2xl">
-                                <div class="text-3xl font-black text-white mb-1">&lt;25ms</div>
-                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Startup Latency</div>
+                                <div class="spec-label">Startup Latency</div>
+                                <div class="spec-value text-blue-400">&lt;25ms</div>
                             </div>
                             <div class="glass p-6 rounded-2xl">
-                                <div class="text-3xl font-black text-white mb-1">12MB</div>
-                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Runtime RSS</div>
+                                <div class="spec-label">Runtime RSS</div>
+                                <div class="spec-value text-blue-400">12.2MB</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl">
+                                <div class="spec-label">Disk Footprint</div>
+                                <div class="spec-value text-blue-400">120MB</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl">
+                                <div class="spec-label">DAG Parsing</div>
+                                <div class="spec-value text-blue-400">&lt;10ms</div>
                             </div>
                         </div>
-                        <div class="flex gap-4 font-mono text-sm text-slate-500 italic">
-                            <span class="text-blue-400 font-bold">✓</span> 50x Faster than Docker <br/>
-                            <span class="text-blue-400 font-bold">✓</span> 20x Faster than Podman
+
+                        <div class="flex gap-4 font-mono text-xs text-slate-500 font-bold italic">
+                            <span class="text-blue-400">✓</span> 50x FASTER THAN DOCKER <br/>
+                            <span class="text-blue-400">✓</span> 36x LEANER THAN AIRFLOW
                         </div>
                     </div>
                     <div class="flex-1 w-full max-w-md">
@@ -153,12 +165,12 @@
                                 <div class="text-blue-400 mb-2">[1: Overview] [2: Workflows] [3: Containers]</div>
                                 <div class="text-emerald-400 mb-6 italic">✓ Engine Ready | 14:42:01</div>
                                 <div class="space-y-4">
-                                    <div class="text-slate-300 font-bold">RUNNING DAG: <span class="text-white underline italic">daily_etl</span></div>
+                                    <div class="text-slate-300 font-bold uppercase tracking-tighter italic">Running Workflow: <span class="text-white underline underline-offset-4">main_build</span></div>
                                     <div class="pl-4 border-l border-white/10 space-y-2">
-                                        <div class="text-emerald-400">✓ extract (12ms)</div>
-                                        <div class="text-emerald-400">✓ validate (8ms)</div>
-                                        <div class="text-blue-400 animate-pulse">▶ transform...</div>
-                                        <div class="text-slate-600">○ load</div>
+                                        <div class="text-emerald-400">✓ scan_repo (4ms)</div>
+                                        <div class="text-emerald-400">✓ compile_bin (18ms)</div>
+                                        <div class="text-blue-400 animate-pulse">▶ deploy_container...</div>
+                                        <div class="text-slate-600">○ cleanup</div>
                                     </div>
                                 </div>
                             </div>
@@ -168,29 +180,67 @@
             </div>
         </div>
 
-        <!-- OMNI-SYNC TAB -->
-        <div id="sync" class="tab-content py-32 px-8">
+        <!-- NEXUS TAB -->
+        <div id="nexus" class="tab-content py-32 px-8">
             <div class="max-w-4xl mx-auto text-center">
-                <div class="text-emerald-500 font-black text-xs uppercase tracking-[0.5em] mb-6 italic">Infrastructure as Code</div>
-                <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic">SYNC. CLICK. <br/><span class="text-emerald-400">AUTOMATE.</span></h2>
-                <p class="text-lg text-slate-400 mb-16 leading-relaxed font-medium">Omni-Sync allows you to click through entire repos. Gain GH Auth via VaultZero to move through entire workflows automatically.</p>
+                <div class="text-yellow-500 font-black text-xs uppercase tracking-[0.5em] mb-6 italic">Automation OS</div>
+                <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic uppercase underline decoration-yellow-500 underline-offset-8">Nexus Shell.</h2>
+                <p class="text-lg text-slate-400 mb-16 leading-relaxed font-medium italic">Nexus amasses your tools, repos, and context into a single interactive environment. It behaves like a typical command line but executes with absolute authority.</p>
                 
                 <div class="grid md:grid-cols-3 gap-8 text-left">
-                    <div class="glass p-8 rounded-3xl hover:border-emerald-500/30 transition-colors">
-                        <div class="text-3xl mb-4 italic">🔄</div>
-                        <h3 class="text-xl font-black mb-3 italic uppercase">Auto-Scaffold</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Instantly convert GitHub repos into Forge-ready workflow configurations based on project structure.</p>
+                    <div class="glass p-8 rounded-3xl group hover:bg-white/5 transition-all">
+                        <div class="text-3xl mb-4 italic text-yellow-500 font-black">01</div>
+                        <h3 class="text-xl font-black mb-3 italic uppercase tracking-tighter">Omni-Sync</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium italic">Automatically scaffold repos as workflows. Click through entire projects with zero setup.</p>
                     </div>
-                    <div class="glass p-8 rounded-3xl hover:border-emerald-500/30 transition-colors">
-                        <div class="text-3xl mb-4 italic">🔐</div>
-                        <h3 class="text-xl font-black mb-3 italic uppercase">VaultZero</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Hardware-rooted secret management for GitHub authentication and production environment variables.</p>
+                    <div class="glass p-8 rounded-3xl group hover:bg-white/5 transition-all border-yellow-500/20">
+                        <div class="text-3xl mb-4 italic text-yellow-500 font-black">02</div>
+                        <h3 class="text-xl font-black mb-3 italic uppercase tracking-tighter">VaultZero</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium italic">Hardware-rooted secret orchestration. Access GH Auth and private keys without cleartext storage.</p>
                     </div>
-                    <div class="glass p-8 rounded-3xl hover:border-emerald-500/30 transition-colors">
-                        <div class="text-3xl mb-4 italic">👻</div>
-                        <h3 class="text-xl font-black mb-3 italic uppercase">GhostMech</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Run ephemeral workflows that leave zero traces. Aggressive pruning at the block level after every run.</p>
+                    <div class="glass p-8 rounded-3xl group hover:bg-white/5 transition-all">
+                        <div class="text-3xl mb-4 italic text-yellow-500 font-black">03</div>
+                        <h3 class="text-xl font-black mb-3 italic uppercase tracking-tighter">Connect</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium italic">Live P2P collaboration. Share workflows and files in real-time with other Nexus nodes.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEATURES TAB -->
+        <div id="features" class="tab-content py-32 px-8">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-4xl font-black text-center mb-20 italic uppercase tracking-[0.2em]">The Caliber Suite.</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
+                        <h3 class="text-2xl font-black mb-4 italic uppercase tracking-tighter text-blue-400">Pidgeon Email</h3>
+                        <p class="text-slate-500 text-sm font-bold italic leading-relaxed">Compose and send emails directly from the CLI. Integrated contact indexing and SMTP management via VaultZero.</p>
+                    </div>
+                    <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
+                        <h3 class="text-2xl font-black mb-4 italic uppercase tracking-tighter text-purple-400">GhostMech Mode</h3>
+                        <p class="text-slate-500 text-sm font-bold italic leading-relaxed">Run ephemeral containers that leave zero forensic traces. Aggressive block-level pruning after every task.</p>
+                    </div>
+                    <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
+                        <h3 class="text-2xl font-black mb-4 italic uppercase tracking-tighter text-emerald-400">Marketplace</h3>
+                        <p class="text-slate-500 text-sm font-bold italic leading-relaxed">Access a curated library of verified automation scripts. Download, audit, and execute in isolation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCS TAB -->
+        <div id="docs" class="tab-content py-32 px-8 text-center">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-4xl font-black mb-20 italic uppercase tracking-[0.3em]">Knowledge Base.</h2>
+                <div class="grid md:grid-cols-2 gap-6 text-left font-bold italic">
+                    <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="glass p-8 rounded-2xl hover:bg-blue-500/10 transition-all uppercase text-sm tracking-widest flex items-center justify-between group">
+                        <span>Shortcut Core Guide</span>
+                        <span class="text-blue-500 group-hover:translate-x-2 transition-transform">→</span>
+                    </a>
+                    <a href="https://github.com/torresjchristopher/forge" target="_blank" class="glass p-8 rounded-2xl hover:bg-blue-500/10 transition-all uppercase text-sm tracking-widest flex items-center justify-between group">
+                        <span>Forge Engine Specs</span>
+                        <span class="text-blue-500 group-hover:translate-x-2 transition-transform">→</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -200,37 +250,39 @@
             <div class="max-w-4xl mx-auto">
                 <div class="text-center mb-20">
                     <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic uppercase">GET <span class="gradient-text">SHORTCUT.</span></h2>
-                    <p class="text-xl text-slate-400 font-medium">Standalone CLI or the full Nexus Automation OS experience.</p>
+                    <p class="text-xl text-slate-400 font-medium italic">Available as a standalone CLI or the complete Nexus OS experience.</p>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Standalone CLI -->
-                    <div class="glass p-10 rounded-[3rem] border-blue-500/20">
+                    <div class="glass p-10 rounded-[3rem] border-blue-500/20 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
                         <h3 class="text-2xl font-black text-white mb-4 italic uppercase">Standalone CLI</h3>
-                        <p class="text-slate-500 text-sm mb-8 font-medium">Perfect for integration into your existing shell workflow. Lightweight and portable.</p>
+                        <p class="text-slate-500 text-sm mb-8 font-bold italic">Portable and powerful. Integrate Forge and Pidgeon into your existing shell environment.</p>
                         
                         <div class="bg-slate-950 border border-white/10 p-4 rounded-xl font-mono text-xs text-blue-300 mb-6 relative group cursor-pointer" onclick="copyCmd(this, 'irm shortcut.cli.sh | iex')">
                             irm shortcut.cli.sh | iex
-                            <span class="copy-feedback hidden absolute -top-8 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-2 py-1 rounded text-[10px]">COPIED</span>
+                            <span class="copy-feedback hidden absolute -top-8 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase">COPIED</span>
                         </div>
 
-                        <a href="Shortcut-CLI-v4.0.2.zip" class="block w-full py-4 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-center text-xs font-black uppercase tracking-widest transition-all">
+                        <a href="Shortcut-CLI-v4.1.0.zip" class="block w-full py-4 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-center text-xs font-black uppercase tracking-widest transition-all italic">
                             Download ZIP
                         </a>
                     </div>
 
                     <!-- Nexus Bundle -->
-                    <div class="glass p-10 rounded-[3rem] border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-transparent">
+                    <div class="glass p-10 rounded-[3rem] border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-transparent relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
                         <div class="text-yellow-500 font-black text-[10px] uppercase tracking-widest mb-2 italic">Recommended</div>
                         <h3 class="text-2xl font-black text-white mb-4 italic uppercase">Nexus OS Bundle</h3>
-                        <p class="text-slate-500 text-sm mb-8 font-medium">Includes Shortcut CLI, Forge Engine, and the interactive Nexus Shell environment.</p>
+                        <p class="text-slate-500 text-sm mb-8 font-bold italic">Includes Shortcut CLI, Forge Engine, Omni-Sync, and the interactive Nexus Shell environment.</p>
                         
                         <div class="bg-slate-950 border border-white/10 p-4 rounded-xl font-mono text-xs text-yellow-500 mb-6 relative group cursor-pointer" onclick="copyCmd(this, 'irm nexus.sh | iex')">
                             irm nexus.sh | iex
-                            <span class="copy-feedback hidden absolute -top-8 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-2 py-1 rounded text-[10px]">COPIED</span>
+                            <span class="copy-feedback hidden absolute -top-8 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase">COPIED</span>
                         </div>
 
-                        <a href="Nexus-Complete-v1.0.0.zip" class="block w-full py-4 bg-yellow-500 text-slate-950 rounded-2xl text-center text-xs font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-lg shadow-yellow-500/20">
+                        <a href="Nexus-Complete-v1.0.0.zip" class="block w-full py-4 bg-yellow-500 text-slate-950 rounded-2xl text-center text-xs font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-lg shadow-yellow-500/20 italic">
                             Download Bundle
                         </a>
                     </div>
@@ -238,58 +290,16 @@
             </div>
         </div>
 
-        <!-- FEATURES TAB -->
-        <div id="features" class="tab-content py-32 px-8">
-            <div class="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Generic Features -->
-                <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
-                    <h3 class="text-2xl font-black mb-4 italic uppercase">Script Marketplace</h3>
-                    <p class="text-slate-500 text-sm font-medium">Built-in marketplace for verified automation scripts. Download and run instantly in quarantine mode.</p>
-                </div>
-                <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
-                    <h3 class="text-2xl font-black mb-4 italic uppercase">Privacy First</h3>
-                    <p class="text-slate-500 text-sm font-medium">Zero telemetry. Zero tracking. No cloud requirement. Your automation is your sovereignty.</p>
-                </div>
-                <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
-                    <h3 class="text-2xl font-black mb-4 italic uppercase">TUI First</h3>
-                    <p class="text-slate-500 text-sm font-medium">Designed for the terminal. Rich, interactive interfaces that outperform any web dashboard.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- DOCS TAB -->
-        <div id="docs" class="tab-content py-32 px-8">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-4xl font-black text-center mb-20 italic underline decoration-blue-500 underline-offset-8">KNOWLEDGE BASE.</h2>
-                <div class="space-y-4">
-                    <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="block glass p-8 rounded-2xl hover:bg-white/5 transition-all flex items-center justify-between group">
-                        <div>
-                            <div class="text-xl font-bold mb-1 italic uppercase">General Documentation</div>
-                            <div class="text-sm text-slate-500">Core concepts and general script management guide.</div>
-                        </div>
-                        <div class="text-blue-500 font-bold group-hover:translate-x-2 transition-transform">→</div>
-                    </a>
-                    <a href="https://github.com/torresjchristopher/forge" target="_blank" class="block glass p-8 rounded-2xl hover:bg-white/5 transition-all flex items-center justify-between group">
-                        <div>
-                            <div class="text-xl font-bold mb-1 italic uppercase">Forge Engine Docs</div>
-                            <div class="text-sm text-slate-500">Advanced container orchestration and DAG scheduling.</div>
-                        </div>
-                        <div class="text-blue-500 font-bold group-hover:translate-x-2 transition-transform">→</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-
     </main>
 
     <!-- Footer -->
-    <footer class="py-20 border-t border-white/5 text-center">
-        <div class="flex justify-center gap-10 text-[10px] font-black uppercase tracking-[0.5em] text-slate-600 mb-10">
+    <footer class="py-20 border-t border-white/5 text-center mt-40">
+        <div class="flex justify-center gap-10 text-[10px] font-black uppercase tracking-[0.5em] text-slate-600 mb-10 italic">
             <a href="https://yukora.org" class="hover:text-blue-400 transition-colors italic">Yukora.org</a>
-            <a href="https://scriptcommander.store" class="hover:text-blue-400 transition-colors italic">Store</a>
+            <a href="https://scriptcommander.store" class="hover:text-blue-400 transition-colors italic">Store Front</a>
             <a href="https://github.com/torresjchristopher" class="hover:text-blue-400 transition-colors italic">GitHub</a>
         </div>
-        <div class="text-slate-800 text-[10px] font-bold">© 2026 SHORTCUT CLI ENGINE. ALL RIGHTS RESERVED.</div>
+        <div class="text-slate-800 text-[10px] font-black uppercase tracking-[0.5em]">© 2026 SHORTCUT CLI ENGINE. ALL RIGHTS RESERVED.</div>
     </footer>
 
     <script>
