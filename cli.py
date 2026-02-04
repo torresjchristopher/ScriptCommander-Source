@@ -7,10 +7,13 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 
+from artifact_sync import ArtifactSync, get_auth_token, save_auth_token
+
 # Shared Configuration
 APP_NAME = "Shortcut CLI"
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scripts")
 QUARANTINE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "quarantine")
+REPOS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "repos")
 MARKETPLACE_URL = "https://raw.githubusercontent.com/torresjchristopher/ScriptCommander-Scripts/main/marketplace.json"
 RECENT_FILES_PATH = os.path.join(os.environ['APPDATA'], 'Microsoft', 'Windows', 'Recent')
 
@@ -19,7 +22,7 @@ console = Console()
 @click.group()
 def main():
     """Shortcut CLI: Container orchestration + Script management + Automation."""
-    for d in [SCRIPTS_DIR, QUARANTINE_DIR]:
+    for d in [SCRIPTS_DIR, QUARANTINE_DIR, REPOS_DIR]:
         if not os.path.exists(d): os.makedirs(d)
 
 
@@ -32,6 +35,47 @@ try:
     attach_forge_commands(main)
 except ImportError:
     console.print("[yellow]Note: Forge integration not available[/yellow]")
+
+
+# ─────────────────────────────────────────────────────────────
+# SYNC GROUP (Omni-Sync Repository Orchestration)
+# ─────────────────────────────────────────────────────────────
+
+@main.group(name='sync')
+def sync():
+    """Sync repositories and auto-scaffold Forge workflows."""
+    pass
+
+@sync.command(name='repo')
+@click.argument('repo_name')
+def sync_repo(repo_name):
+    """Clone/Update a repo and auto-generate Forge config.
+    
+    Example: shortcut sync repo torresjchristopher/forge
+    """
+    token = get_auth_token()
+    syncer = ArtifactSync(token=token)
+    success = syncer.clone_and_sync(repo_name, REPOS_DIR)
+    if success:
+        console.print(f"[bold green]✓ Successfully synced {repo_name}[/bold green]")
+    else:
+        console.print(f"[yellow]Synced {repo_name} but no new workflows detected.[/yellow]")
+
+
+# ─────────────────────────────────────────────────────────────
+# VAULT GROUP (VaultZero Secret Management)
+# ─────────────────────────────────────────────────────────────
+
+@main.group(name='vault')
+def vault():
+    """Secure secret management (VaultZero)."""
+    pass
+
+@vault.command(name='login')
+@click.argument('token')
+def vault_login(token):
+    """Save GitHub token to VaultZero."""
+    save_auth_token(token)
 
 
 # ─────────────────────────────────────────────────────────────

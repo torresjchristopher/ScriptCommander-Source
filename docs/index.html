@@ -3,302 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shortcut CLI | The High-Performance Terminal Orchestrator</title>
+    <title>Shortcut CLI v4.0 | Unified Automation & Orchestration</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --bg-main: #0a0a0a;
-            --accent: #2563eb;
-            --border: rgba(255, 255, 255, 0.08);
+        body { background-color: #020617; color: white; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        body { 
-            background-color: var(--bg-main); 
-            color: #ededed; 
-            font-family: 'Inter', sans-serif; 
-            scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
-        }
-        .mono { font-family: 'JetBrains Mono', monospace; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .nav-link.active { color: #fff; border-bottom: 2px solid var(--accent); }
-        .terminal-block {
-            background: #0f0f0f;
-            border: 1px solid var(--border);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-        }
-        .btn-primary {
-            background: #fff;
-            color: #000;
-            transition: all 0.2s ease;
-        }
-        .btn-primary:hover { transform: translateY(-1px); background: #f0f0f0; }
-        
-        .guide-card {
-            background: #111;
-            border: 1px solid var(--border);
-            transition: all 0.2s ease;
-        }
-        .guide-card:hover { border-color: rgba(37, 99, 235, 0.4); }
+        .tab-content.active { display: block; }
+        .nav-link.active { color: #60a5fa; border-bottom: 2px solid #60a5fa; }
+        .carousel-slide { opacity: 0 !important; transition: opacity 0.8s ease-in-out; pointer-events: none; }
+        .carousel-slide.active { opacity: 1 !important; pointer-events: auto; }
+        .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        @keyframes pulse-slow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+        .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
     </style>
 </head>
-<body class="selection:bg-blue-500/30">
+<body class="antialiased selection:bg-blue-500/30">
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 border-b border-white/[0.05] bg-[#0a0a0a]/90 backdrop-blur-xl">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-7 h-7 bg-blue-600 rounded flex items-center justify-center font-bold text-white text-[13px]">S</div>
-                <span class="text-lg font-bold tracking-tighter text-white">Shortcut CLI</span>
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-8 h-20 flex justify-between items-center">
+            <div class="flex items-center space-x-3 group cursor-pointer" onclick="showTab('home')">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
+                    <span class="text-white font-black text-sm italic">S</span>
+                </div>
+                <div class="text-2xl font-black tracking-tighter gradient-text">Shortcut</div>
             </div>
-            <div class="hidden md:flex space-x-1">
-                <button onclick="showTab('home')" id="nav-home" class="nav-link text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all px-6 py-5 active">Product</button>
-                <button onclick="showTab('features')" id="nav-features" class="nav-link text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all px-6 py-5">Features</button>
-                <button onclick="showTab('trap')" id="nav-trap" class="nav-link text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all px-6 py-5 text-red-500">The UI Trap</button>
-                <button onclick="showTab('guide')" id="nav-guide" class="nav-link text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all px-6 py-5">Guide</button>
-                <button onclick="showTab('privacy')" id="nav-privacy" class="nav-link text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all px-6 py-5">Privacy</button>
+            <div class="hidden md:flex space-x-8 font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                <button onclick="showTab('home')" id="nav-home" class="nav-link active pb-1 transition hover:text-blue-400">Home</button>
+                <button onclick="showTab('forge')" id="nav-forge" class="nav-link pb-1 transition hover:text-blue-400">Forge Engine</button>
+                <button onclick="showTab('sync')" id="nav-sync" class="nav-link pb-1 transition hover:text-blue-400 text-emerald-400">Omni-Sync</button>
+                <button onclick="showTab('features')" id="nav-features" class="nav-link pb-1 transition hover:text-blue-400">Features</button>
+                <button onclick="showTab('docs')" id="nav-docs" class="nav-link pb-1 transition hover:text-blue-400">Docs</button>
             </div>
-            <div class="flex items-center">
-                <a href="Shortcut-CLI-v3.0.0.zip" class="text-[11px] font-black uppercase tracking-widest bg-blue-600 px-4 py-2 rounded text-white hover:bg-blue-500 transition-all">Download</a>
-            </div>
+            <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all">GitHub</a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="pt-32 pb-24 max-w-6xl mx-auto px-6">
+    <!-- MAIN WRAPPER -->
+    <main class="pt-20">
         
-        <!-- SECTION: HOME -->
+        <!-- HOME TAB -->
         <div id="home" class="tab-content active">
-            <div class="flex flex-col lg:flex-row items-center gap-20">
-                <div class="lg:w-1/2 space-y-10">
-                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-black uppercase tracking-[0.2em]">
-                        Production v3.2.0
-                    </div>
-                    <h1 class="text-7xl font-black tracking-tighter text-white leading-[0.95]">
-                        The terminal <br/><span class="text-blue-600">orchestrator.</span>
-                    </h1>
-                    <p class="text-lg text-slate-400 leading-relaxed max-w-lg font-medium">
-                        Accelerate your daily workflow with 20+ verified automation tools. Built for speed, locked for absolute data sovereignty.
-                    </p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center bg-[#0d0d0d] border border-white/10 rounded-lg p-2 pl-5 max-w-md group shadow-2xl">
-                            <span class="text-slate-600 mono text-sm mr-4">$</span>
-                            <code class="text-blue-400 text-[13px] mono truncate flex-1">irm shortcut.cli.sh | iex</code>
-                            <button onclick="copyInstall()" class="bg-white/5 hover:bg-white/10 text-slate-400 px-4 py-2 rounded text-[10px] font-black transition-all uppercase tracking-widest border border-white/5 ml-4">Copy</button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center space-x-8 pt-4">
-                        <a href="Shortcut-CLI-v3.0.0.zip" class="btn-primary px-10 py-4 rounded font-black text-xs uppercase tracking-widest shadow-2xl">Get Started</a>
-                        <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="text-slate-500 hover:text-white text-[11px] font-black uppercase tracking-widest flex items-center space-x-2 transition-all">
-                            <span>Source Code</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="lg:w-1/2 w-full">
-                    <div class="terminal-block rounded-xl overflow-hidden border border-white/10">
-                        <div class="bg-white/[0.03] px-5 py-3 flex items-center justify-between border-b border-white/[0.05]">
-                            <div class="flex space-x-1.5">
-                                <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                            </div>
-                            <span class="text-[9px] mono text-slate-500 uppercase tracking-[0.2em] font-bold">shortcut --tui</span>
-                        </div>
-                        <div class="p-10 font-mono text-[13px] space-y-6 min-h-[350px]">
-                            <div class="flex space-x-2">
-                                <span class="text-emerald-500 font-bold">>>></span>
-                                <span class="text-white font-bold">SHORTCUT CLI v3.2</span>
-                            </div>
-                            <div class="space-y-2 text-slate-400">
-                                <div class="flex items-center space-x-4 bg-blue-600/10 border-l-2 border-blue-600 p-2">
-                                    <span class="text-blue-500 font-bold">></span>
-                                    <span>🚀 Workspaces</span>
-                                </div>
-                                <div class="flex items-center space-x-4 p-2 opacity-50">
-                                    <span>  📧 Comms Hub</span>
-                                </div>
-                                <div class="flex items-center space-x-4 p-2 opacity-50">
-                                    <span>  📂 Local Scripts</span>
-                                </div>
-                            </div>
-                            <div class="pt-8 text-slate-600 text-xs italic">// Mission Control Active</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: TRAP -->
-        <div id="trap" class="tab-content">
-            <div class="max-w-4xl mx-auto space-y-16">
-                <div class="text-center space-y-6">
-                    <h2 class="text-5xl font-black text-white tracking-tighter">The UI Trap.</h2>
-                    <p class="text-slate-400 font-medium max-w-2xl mx-auto text-lg leading-relaxed">
-                        Modern Graphical User Interfaces (GUIs) are no longer built for you. They are built to extract from you.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-sm leading-relaxed">
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold uppercase tracking-widest text-xs">Deception by Design</h4>
-                        <p class="text-slate-500">GUIs use "Dark Patterns"—hidden toggles, confusing layouts, and multi-layered menus—to trick users into forfeiting their privacy. By the time you find the "Disable Tracking" button, you've already clicked "I Agree" five times.</p>
-                    </div>
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold uppercase tracking-widest text-xs">The Vulnerability Surface</h4>
-                        <p class="text-slate-500">Every extra line of UI code is a potential security breach. Heavy applications amass your data in the cloud, where it becomes a liability. When their servers are breached, your digital life is exposed.</p>
-                    </div>
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold uppercase tracking-widest text-xs">Forced Retention</h4>
-                        <p class="text-slate-500">UIs are engineered for "stickiness." They want you to stay in their ecosystem, clicking through their menus. Shortcut CLI circumvents this by performing the task directly on your hardware and getting out of your way.</p>
-                    </div>
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold uppercase tracking-widest text-xs">The Sovereign Choice</h4>
-                        <p class="text-slate-500">The terminal is the last place where you are truly in control. Shortcut CLI brings high-performance tools to the command line so you never have to enter the "Deceptive UI" of heavy applications again.</p>
-                    </div>
-                </div>
-
-                <div class="bg-red-500/5 border border-red-500/20 p-10 rounded-2xl text-center">
-                    <p class="text-red-400 text-sm font-bold uppercase tracking-[0.2em]">Function Over Form. Sovereignty Over Deception.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: FEATURES -->
-        <div id="features" class="tab-content">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-1px bg-white/10 rounded-2xl overflow-hidden border border-white/10">
-                <div class="bg-[#0a0a0a] p-12 space-y-6">
-                    <h3 class="text-lg font-bold text-white tracking-tight">🚀 Workspaces</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed font-medium">Launch your entire professional environment—Git repos, Docker, Slack, and Docs—with a single keystroke.</p>
-                </div>
-                <div class="bg-[#0a0a0a] p-12 space-y-6">
-                    <h3 class="text-lg font-bold text-white tracking-tight">📧 Comms Hub</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed font-medium">A unified, terminal-based inbox for Email and Slack. Fast replies, zero loading screens, total privacy.</p>
-                </div>
-                <div class="bg-[#0a0a0a] p-12 space-y-6">
-                    <h3 class="text-lg font-bold text-white tracking-tight">🧤 Data Stripper</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed font-medium">Automatically scrub hidden metadata, GPS logs, and author IDs from files before you share them.</p>
-                </div>
-                <div class="bg-[#0a0a0a] p-12 space-y-6">
-                    <h3 class="text-lg font-bold text-white tracking-tight">🏗️ Script Builder</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed font-medium">Code with Shortcut. Generate new automation scripts autonomously using built-in boilerplate engines.</p>
-                </div>
-                <div class="bg-[#0a0a0a] p-12 space-y-6">
-                    <h3 class="text-lg font-bold text-white tracking-tight">🔐 Secure Vault</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed font-medium">Local-only, AES-encrypted storage for your non-critical keys and IDs. No cloud sync, no risk.</p>
-                </div>
-                <div class="bg-[#0a0a0a] p-12 space-y-6">
-                    <h3 class="text-lg font-bold text-white tracking-tight">📁 Quick Explorer</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed font-medium">Navigate your drive at terminal speed. Find, launch, and manage files without the Windows Explorer UI.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: GUIDE -->
-        <div id="guide" class="tab-content">
-            <div class="max-w-4xl mx-auto space-y-20">
-                <div class="space-y-6">
-                    <h2 class="text-4xl font-black text-white tracking-tighter">Usage Guide</h2>
-                    <p class="text-slate-400 font-medium">Command orchestration for the modern developer.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div class="guide-card p-10 rounded-2xl space-y-6">
-                        <h3 class="text-xs font-black uppercase tracking-[0.2em] text-blue-500">Visual Mode</h3>
-                        <div class="space-y-2">
-                            <h4 class="text-2xl font-bold text-white">Interactive TUI</h4>
-                            <p class="text-sm text-slate-500">The cockpit. Best for exploring your library and managing files.</p>
-                        </div>
-                        <div class="bg-black p-4 rounded-lg border border-white/5 mono text-xs text-blue-400">
-                            python app.py
-                        </div>
-                        <ul class="text-[11px] font-black uppercase tracking-widest text-slate-600 space-y-3">
-                            <li>↑ / ↓ : Flip through items</li>
-                            <li>Enter : Execute Selection</li>
-                            <li>V : View Source Code</li>
-                            <li>Q : Return / Exit</li>
-                        </ul>
-                    </div>
-
-                    <div class="guide-card p-10 rounded-2xl space-y-6">
-                        <h3 class="text-xs font-black uppercase tracking-[0.2em] text-blue-500">Headless Mode</h3>
-                        <div class="space-y-2">
-                            <h4 class="text-2xl font-bold text-white">Direct CLI</h4>
-                            <p class="text-sm text-slate-500">The hammer. Best for rapid tasks and scripting.</p>
-                        </div>
-                        <div class="bg-black p-4 rounded-lg border border-white/5 mono text-xs text-blue-400">
-                            python app.py [command]
-                        </div>
-                        <div class="space-y-3 mono text-[10px] text-slate-500">
-                            <div>- shortcut list</div>
-                            <div>- shortcut run [ID]</div>
-                            <div>- shortcut search [query]</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: PRIVACY -->
-        <div id="privacy" class="tab-content">
-            <div class="max-w-4xl mx-auto space-y-24">
-                <div class="text-center space-y-4">
-                    <h2 class="text-5xl font-black text-white tracking-tighter">Privacy Sovereignty.</h2>
-                    <p class="text-slate-500 font-medium max-w-xl mx-auto text-lg leading-relaxed">Shortcut CLI is architected to be invisible to your data. No accounts. No tracking. No compromise.</p>
+            <div class="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden">
+                <div class="absolute inset-0 z-0">
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
+                    <div class="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 2s"></div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-16">
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold text-sm uppercase tracking-widest">Local-Only Memory</h4>
-                        <p class="text-[13px] text-slate-500 leading-relaxed">All script metadata and file histories exist exclusively in volatile local memory. Shortcut does not maintain a persistent database of your personal files.</p>
+                <div class="carousel-container relative z-10 w-full max-w-5xl mx-auto px-6 h-[600px]">
+                    <!-- Slide 1: Shortcut CLI -->
+                    <div class="carousel-slide active absolute inset-0 flex flex-col items-center justify-center text-center">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-8">
+                            New Release v4.0.2
+                        </div>
+                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tight leading-tight italic">Automation. <br/><span class="gradient-text text-normal">Simplified.</span></h2>
+                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-medium">Unified platform for container orchestration, repo orchestration, and script management. One binary. Zero dependencies.</p>
+                        <div class="flex flex-col md:flex-row gap-4 items-center">
+                            <div class="bg-slate-900/80 backdrop-blur border border-white/10 px-6 py-4 rounded-2xl font-mono text-sm text-blue-300 cursor-pointer hover:border-blue-400 transition group relative" onclick="copyCmd(this, 'irm shortcut.cli.sh | iex')">
+                                <span class="text-slate-500 mr-2">$</span> irm shortcut.cli.sh | iex
+                                <span class="copy-feedback hidden absolute -top-10 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">COPIED!</span>
+                            </div>
+                            <button onclick="showTab('features')" class="px-8 py-4 bg-white text-slate-950 rounded-2xl font-extrabold hover:scale-105 transition-all shadow-xl shadow-white/10">EXPLORE TOOLS</button>
+                        </div>
                     </div>
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold text-sm uppercase tracking-widest">Zero Telemetry</h4>
-                        <p class="text-[13px] text-slate-500 leading-relaxed">The application contains no analytics agents, tracking pixels, or pings. Your usage patterns and identity remain completely unknown to us.</p>
+
+                    <!-- Slide 2: Forge -->
+                    <div class="carousel-slide absolute inset-0 flex flex-col items-center justify-center text-center">
+                        <div class="text-sm font-black text-blue-500 uppercase tracking-[0.4em] mb-4 italic">The Forge Engine</div>
+                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter leading-tight italic">50X FASTER <br/>THAN DOCKER.</h2>
+                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">Warmed container startups in &lt;25ms. Integrated Airflow DAGs. Native TUI management.</p>
+                        <button onclick="showTab('forge')" class="px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-blue-500/20">ENTER THE FORGE</button>
                     </div>
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold text-sm uppercase tracking-widest">No Cloud persistence</h4>
-                        <p class="text-[13px] text-slate-500 leading-relaxed">Shortcut CLI has no home server. We do not offer cloud syncing, ensuring your automated workflows never leave your physical hardware.</p>
+
+                    <!-- Slide 3: Omni-Sync -->
+                    <div class="carousel-slide absolute inset-0 flex flex-col items-center justify-center text-center">
+                        <div class="text-sm font-black text-emerald-500 uppercase tracking-[0.4em] mb-4 italic">Omni-Sync Technology</div>
+                        <h2 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter leading-tight italic">REPOS AS <br/>WORKFLOWS.</h2>
+                        <p class="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-medium">Automatic scaffolding of entire repositories into Forge-ready DAGs. Sync across nodes with VaultZero security.</p>
+                        <button onclick="showTab('sync')" class="px-10 py-5 border-2 border-emerald-500 text-emerald-400 rounded-2xl font-black text-lg hover:bg-emerald-500/10 transition-all">START SYNCING</button>
                     </div>
-                    <div class="space-y-4">
-                        <h4 class="text-white font-bold text-sm uppercase tracking-widest">Radical Transparency</h4>
-                        <p class="text-[13px] text-slate-500 leading-relaxed">Absolute privacy requires absolute transparency. The entire codebase is open for inspection on GitHub at all times.</p>
+                </div>
+
+                <!-- Carousel Controls -->
+                <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                    <button onclick="goToSlide(0)" class="carousel-dot w-12 h-1 bg-white/10 rounded-full transition-all overflow-hidden relative">
+                        <div class="absolute inset-0 bg-blue-500 scale-x-0 origin-left transition-transform duration-[8000ms]" id="dot-progress-0"></div>
+                    </button>
+                    <button onclick="goToSlide(1)" class="carousel-dot w-12 h-1 bg-white/10 rounded-full transition-all overflow-hidden relative">
+                        <div class="absolute inset-0 bg-blue-500 scale-x-0 origin-left transition-transform duration-[8000ms]" id="dot-progress-1"></div>
+                    </button>
+                    <button onclick="goToSlide(2)" class="carousel-dot w-12 h-1 bg-white/10 rounded-full transition-all overflow-hidden relative">
+                        <div class="absolute inset-0 bg-blue-500 scale-x-0 origin-left transition-transform duration-[8000ms]" id="dot-progress-2"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORGE TAB -->
+        <div id="forge" class="tab-content py-32 px-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-20 items-center mb-40">
+                    <div class="flex-1">
+                        <div class="text-blue-500 font-black text-xs uppercase tracking-[0.5em] mb-6 italic">Performance Core</div>
+                        <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic">LIGHTNING IN <br/>A BOX.</h2>
+                        <p class="text-lg text-slate-400 mb-10 leading-relaxed font-medium">Forge integrates Airflow-style workflows directly into an unheard-of lightweight container service. It prunes data effectively and runs entirely from a native TUI.</p>
+                        <div class="grid grid-cols-2 gap-6 mb-10">
+                            <div class="glass p-6 rounded-2xl">
+                                <div class="text-3xl font-black text-white mb-1">&lt;25ms</div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Startup Latency</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl">
+                                <div class="text-3xl font-black text-white mb-1">12MB</div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Runtime RSS</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 font-mono text-sm text-slate-500 italic">
+                            <span class="text-blue-400 font-bold">✓</span> 50x Faster than Docker <br/>
+                            <span class="text-blue-400 font-bold">✓</span> 20x Faster than Podman
+                        </div>
                     </div>
+                    <div class="flex-1 w-full max-w-md">
+                        <div class="glass rounded-3xl overflow-hidden shadow-2xl border-white/10">
+                            <div class="bg-white/5 p-4 border-b border-white/5 flex items-center justify-between">
+                                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 italic font-mono">FORGE ENGINE v3.2</div>
+                                <div class="flex gap-1.5">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50 animate-pulse"></div>
+                                </div>
+                            </div>
+                            <div class="p-8 font-mono text-xs leading-relaxed">
+                                <div class="text-blue-400 mb-2">[1: Overview] [2: Workflows] [3: Containers]</div>
+                                <div class="text-emerald-400 mb-6 italic">✓ Engine Ready | 14:42:01</div>
+                                <div class="space-y-4">
+                                    <div class="text-slate-300 font-bold">RUNNING DAG: <span class="text-white underline italic">daily_etl</span></div>
+                                    <div class="pl-4 border-l border-white/10 space-y-2">
+                                        <div class="text-emerald-400">✓ extract (12ms)</div>
+                                        <div class="text-emerald-400">✓ validate (8ms)</div>
+                                        <div class="text-blue-400 animate-pulse">▶ transform...</div>
+                                        <div class="text-slate-600">○ load</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OMNI-SYNC TAB -->
+        <div id="sync" class="tab-content py-32 px-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="text-emerald-500 font-black text-xs uppercase tracking-[0.5em] mb-6 italic">Infrastructure as Code</div>
+                <h2 class="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic">SYNC. CLICK. <br/><span class="text-emerald-400">AUTOMATE.</span></h2>
+                <p class="text-lg text-slate-400 mb-16 leading-relaxed font-medium">Omni-Sync allows you to click through entire repos. Gain GH Auth via VaultZero to move through entire workflows automatically.</p>
+                
+                <div class="grid md:grid-cols-3 gap-8 text-left">
+                    <div class="glass p-8 rounded-3xl hover:border-emerald-500/30 transition-colors">
+                        <div class="text-3xl mb-4 italic">🔄</div>
+                        <h3 class="text-xl font-black mb-3 italic uppercase">Auto-Scaffold</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Instantly convert GitHub repos into Forge-ready workflow configurations based on project structure.</p>
+                    </div>
+                    <div class="glass p-8 rounded-3xl hover:border-emerald-500/30 transition-colors">
+                        <div class="text-3xl mb-4 italic">🔐</div>
+                        <h3 class="text-xl font-black mb-3 italic uppercase">VaultZero</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Hardware-rooted secret management for GitHub authentication and production environment variables.</p>
+                    </div>
+                    <div class="glass p-8 rounded-3xl hover:border-emerald-500/30 transition-colors">
+                        <div class="text-3xl mb-4 italic">👻</div>
+                        <h3 class="text-xl font-black mb-3 italic uppercase">GhostMech</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Run ephemeral workflows that leave zero traces. Aggressive pruning at the block level after every run.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEATURES TAB -->
+        <div id="features" class="tab-content py-32 px-8">
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Generic Features -->
+                <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
+                    <h3 class="text-2xl font-black mb-4 italic uppercase">Script Marketplace</h3>
+                    <p class="text-slate-500 text-sm font-medium">Built-in marketplace for verified automation scripts. Download and run instantly in quarantine mode.</p>
+                </div>
+                <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
+                    <h3 class="text-2xl font-black mb-4 italic uppercase">Privacy First</h3>
+                    <p class="text-slate-500 text-sm font-medium">Zero telemetry. Zero tracking. No cloud requirement. Your automation is your sovereignty.</p>
+                </div>
+                <div class="glass p-10 rounded-[2.5rem] group hover:bg-white/5 transition-all">
+                    <h3 class="text-2xl font-black mb-4 italic uppercase">TUI First</h3>
+                    <p class="text-slate-500 text-sm font-medium">Designed for the terminal. Rich, interactive interfaces that outperform any web dashboard.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCS TAB -->
+        <div id="docs" class="tab-content py-32 px-8">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-4xl font-black text-center mb-20 italic underline decoration-blue-500 underline-offset-8">KNOWLEDGE BASE.</h2>
+                <div class="space-y-4">
+                    <a href="https://github.com/torresjchristopher/ScriptCommander-Source" target="_blank" class="block glass p-8 rounded-2xl hover:bg-white/5 transition-all flex items-center justify-between group">
+                        <div>
+                            <div class="text-xl font-bold mb-1 italic uppercase">General Documentation</div>
+                            <div class="text-sm text-slate-500">Core concepts and general script management guide.</div>
+                        </div>
+                        <div class="text-blue-500 font-bold group-hover:translate-x-2 transition-transform">→</div>
+                    </a>
+                    <a href="https://github.com/torresjchristopher/forge" target="_blank" class="block glass p-8 rounded-2xl hover:bg-white/5 transition-all flex items-center justify-between group">
+                        <div>
+                            <div class="text-xl font-bold mb-1 italic uppercase">Forge Engine Docs</div>
+                            <div class="text-sm text-slate-500">Advanced container orchestration and DAG scheduling.</div>
+                        </div>
+                        <div class="text-blue-500 font-bold group-hover:translate-x-2 transition-transform">→</div>
+                    </a>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <footer class="border-t border-white/[0.05] py-20 bg-[#0a0a0a]">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-slate-700 text-[10px] font-black uppercase tracking-[0.3em]">
-            <p>&copy; 2026 Shortcut CLI Project</p>
-            <div class="flex space-x-12 mt-8 md:mt-0">
-                <a href="https://github.com/torresjchristopher/ScriptCommander-Source" class="hover:text-white transition-all">GitHub</a>
-                <a href="#" class="hover:text-white transition-all">License</a>
-                <a href="#" class="hover:text-white transition-all">Support</a>
-            </div>
+    <!-- Footer -->
+    <footer class="py-20 border-t border-white/5 text-center">
+        <div class="flex justify-center gap-10 text-[10px] font-black uppercase tracking-[0.5em] text-slate-600 mb-10">
+            <a href="https://yukora.org" class="hover:text-blue-400 transition-colors italic">Yukora.org</a>
+            <a href="https://scriptcommander.store" class="hover:text-blue-400 transition-colors italic">Store</a>
+            <a href="https://github.com/torresjchristopher" class="hover:text-blue-400 transition-colors italic">GitHub</a>
         </div>
+        <div class="text-slate-800 text-[10px] font-bold">© 2026 SHORTCUT CLI ENGINE. ALL RIGHTS RESERVED.</div>
     </footer>
 
     <script>
+        let currentSlide = 0;
+        const slides = 3;
+        let autoplayInterval;
+        const slideInterval = 8000;
+
+        function showSlide(n) {
+            const carouselSlides = document.querySelectorAll('.carousel-slide');
+            const progressBars = [0, 1, 2].map(i => document.getElementById('dot-progress-' + i));
+            
+            carouselSlides.forEach(slide => slide.classList.remove('active'));
+            progressBars.forEach(bar => {
+                bar.style.transition = 'none';
+                bar.style.transform = 'scaleX(0)';
+            });
+            
+            carouselSlides[n].classList.add('active');
+            
+            // Animation for current bar
+            setTimeout(() => {
+                progressBars[n].style.transition = 'transform 8s linear';
+                progressBars[n].style.transform = 'scaleX(1)';
+            }, 50);
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides;
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(n) {
+            currentSlide = n;
+            showSlide(currentSlide);
+            resetAutoplay();
+        }
+
+        function resetAutoplay() {
+            clearInterval(autoplayInterval);
+            autoplayInterval = setInterval(nextSlide, slideInterval);
+        }
+
+        function copyCmd(element, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const feedback = element.querySelector('.copy-feedback');
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 2000);
+            });
+        }
+
         function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            document.getElementById('nav-' + tabId).classList.add('active');
+            const navLink = document.getElementById('nav-' + tabId);
+            if (navLink) navLink.classList.add('active');
             window.scrollTo(0, 0);
         }
-        function copyInstall() {
-            navigator.clipboard.writeText('powershell -c "irm shortcut.cli.sh | iex"');
-            alert('Install command copied!');
-        }
+
+        // Initialize
+        showSlide(0);
+        resetAutoplay();
     </script>
 </body>
 </html>

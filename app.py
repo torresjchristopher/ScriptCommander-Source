@@ -4,6 +4,10 @@ import subprocess
 import requests
 import msvcrt
 import shutil
+try:
+    from forge_integration import launch_forge_command
+except ImportError:
+    launch_forge_command = None
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -25,19 +29,23 @@ console = Console()
 
 class ShortcutTUI:
     def __init__(self):
-        # PROMOTED MENU: Putting the magic front and center
+        # Top-level menu aligned with CLI structure
         self.menu_options = [
-            "🚀 Workspaces (Morning Routine)", 
-            "📧 Comms Hub (Email/Slack)", 
-            "📂 Local Scripts", 
-            "🌐 Marketplace", 
-            "🔍 GitHub Search", 
-            "📁 Quick Explorer", 
-            "🕒 Recent Files", 
+            "Forge (Container Orchestration)", 
+            "Scripts (Automation)", 
+            "Omni-Sync (Repo Orchestration)",
+            "Features (Utilities)", 
             "Exit"
         ]
+        
+        # Sub-menus
+        self.forge_options = ["Launch Dashboard (TUI)", "System Status", "Benchmark Startup", "Back"]
+        self.scripts_options = ["Local Scripts", "Marketplace", "GitHub Search", "Back"]
+        self.sync_options = ["Sync GitHub Repo", "Manage Auth (VaultZero)", "Back"]
+        self.features_options = ["Workspaces (Morning Routine)", "Comms Hub", "Quick Explorer", "Recent Files", "Back"]
+
         self.current_index = 0
-        self.state = "MENU" # MENU, SCRIPTS, MARKET, RECENT, EXPLORER, SEARCH
+        self.state = "MENU" # MENU, FORGE_MENU, SCRIPTS_MENU, SYNC_MENU, FEATURES_MENU, SCRIPTS_LIST, MARKET, SEARCH, RECENT, EXPLORER
         self.items = []
         self.sub_index = 0
         self.current_path = os.path.expanduser("~") # For Explorer
@@ -109,14 +117,16 @@ class ShortcutTUI:
             return sorted(items, key=lambda x: (x['type'] != 'dir', x['name'].lower()))
         except: return [{"name": "Permission Denied", "path": self.current_path, "type": "error"}]
 
-    def draw_menu(self):
+    def draw_menu(self, options, title_override=None):
+        title = title_override if title_override else f"[bold cyan]{APP_NAME}[/bold cyan] v{VERSION}"
         table = Table(box=box.ROUNDED, show_header=False, expand=True, border_style="blue")
-        for i, option in enumerate(self.menu_options):
+        
+        for i, option in enumerate(options):
             style = "bold white on blue" if i == self.current_index else "white"
             prefix = "> " if i == self.current_index else "  "
             table.add_row(Text(f"{prefix}{option}", style=style))
         
-        return Panel(table, title=f"[bold cyan]{APP_NAME}[/bold cyan] v{VERSION}", subtitle="[dim]Arrows to navigate, Enter to select[/dim]")
+        return Panel(table, title=title, subtitle="[dim]Arrows to navigate, Enter to select[/dim]")
 
     def draw_list(self, title, items, index, is_market=False, is_explorer=False):
         table = Table(box=box.ROUNDED, expand=True, border_style="green")
@@ -202,45 +212,104 @@ class ShortcutTUI:
         except Exception as e: console.print(f"[red]Failed: {e}[/red]")
         console.input("\nPress Enter to continue...")
 
+    def get_current_options(self):
+        if self.state == "MENU": return self.menu_options
+        if self.state == "FORGE_MENU": return self.forge_options
+        if self.state == "SCRIPTS_MENU": return self.scripts_options
+        if self.state == "SYNC_MENU": return self.sync_options
+        if self.state == "FEATURES_MENU": return self.features_options
+        return []
+
     def main_loop(self):
         with Live(refresh_per_second=10, screen=True) as live:
             while self.running:
-                if self.state == "MENU": live.update(self.draw_menu())
-                elif self.state == "SCRIPTS": live.update(self.draw_list("My Scripts", self.items, self.sub_index))
+                # DRAWING
+                if self.state == "MENU": live.update(self.draw_menu(self.menu_options))
+                elif self.state == "FORGE_MENU": live.update(self.draw_menu(self.forge_options, title_override="Forge Menu"))
+                elif self.state == "SCRIPTS_MENU": live.update(self.draw_menu(self.scripts_options, title_override="Scripts Menu"))
+                elif self.state == "SYNC_MENU": live.update(self.draw_menu(self.sync_options, title_override="Omni-Sync Menu"))
+                elif self.state == "FEATURES_MENU": live.update(self.draw_menu(self.features_options, title_override="Features Menu"))
+                
+                elif self.state == "SCRIPTS_LIST": live.update(self.draw_list("My Scripts", self.items, self.sub_index))
                 elif self.state == "MARKET": live.update(self.draw_list("Verified Marketplace", self.items, self.sub_index, True))
                 elif self.state == "SEARCH": live.update(self.draw_list("GitHub Global Search", self.items, self.sub_index))
                 elif self.state == "RECENT": live.update(self.draw_list("Quick Open Files", self.items, self.sub_index))
                 elif self.state == "EXPLORER": live.update(self.draw_list("Quick Explorer", self.items, self.sub_index, is_explorer=True))
 
+                # INPUT
                 if msvcrt.kbhit():
                     key = ord(msvcrt.getch())
                     if key == 224:
                         key = ord(msvcrt.getch())
                         if key == 72: # Up
-                            if self.state == "MENU": self.current_index = (self.current_index - 1) % len(self.menu_options)
+                            if "MENU" in self.state: self.current_index = (self.current_index - 1) % len(self.get_current_options())
                             else: self.sub_index = (self.sub_index - 1) % len(self.items) if self.items else 0
                         elif key == 80: # Down
-                            if self.state == "MENU": self.current_index = (self.current_index + 1) % len(self.menu_options)
+                            if "MENU" in self.state: self.current_index = (self.current_index + 1) % len(self.get_current_options())
                             else: self.sub_index = (self.sub_index + 1) % len(self.items) if self.items else 0
                     
                     elif key == 13: # Enter
                         if self.state == "MENU":
                             choice = self.menu_options[self.current_index]
-                            if "Workspaces" in choice:
-                                live.stop(); subprocess.run([sys.executable, os.path.join(SCRIPTS_DIR, "morning-routine.py")]); live.start()
-                            elif "Comms Hub" in choice:
-                                live.stop(); subprocess.run([sys.executable, os.path.join(SCRIPTS_DIR, "comms-hub.py")]); live.start()
-                            elif "Local Scripts" in choice: self.state = "SCRIPTS"; self.items = self.get_local_scripts(); self.sub_index = 0
-                            elif "Quick Explorer" in choice: self.state = "EXPLORER"; self.items = self.get_explorer_items(); self.sub_index = 0
+                            if "Forge" in choice: self.state = "FORGE_MENU"; self.current_index = 0
+                            elif "Scripts" in choice: self.state = "SCRIPTS_MENU"; self.current_index = 0
+                            elif "Omni-Sync" in choice: self.state = "SYNC_MENU"; self.current_index = 0
+                            elif "Features" in choice: self.state = "FEATURES_MENU"; self.current_index = 0
+                            elif "Exit" in choice: self.running = False
+                        
+                        elif self.state == "FORGE_MENU":
+                            choice = self.forge_options[self.current_index]
+                            if "Dashboard" in choice:
+                                if launch_forge_command:
+                                    live.stop(); launch_forge_command(['tui']); live.start()
+                                else:
+                                    live.stop(); console.print("[red]Forge integration not available[/red]"); console.input(); live.start()
+                            elif "System Status" in choice:
+                                if launch_forge_command:
+                                    live.stop(); launch_forge_command(['system', 'usage']); console.input("\nPress Enter..."); live.start()
+                            elif "Benchmark" in choice:
+                                if launch_forge_command:
+                                    live.stop(); launch_forge_command(['benchmark', 'startup']); console.input("\nPress Enter..."); live.start()
+                            elif "Back" in choice: self.state = "MENU"; self.current_index = 0
+
+                        elif self.state == "SCRIPTS_MENU":
+                            choice = self.scripts_options[self.current_index]
+                            if "Local Scripts" in choice: self.state = "SCRIPTS_LIST"; self.items = self.get_local_scripts(); self.sub_index = 0
+                            elif "Marketplace" in choice: self.state = "MARKET"; self.items = self.get_marketplace(); self.sub_index = 0
                             elif "GitHub Search" in choice:
                                 live.stop()
                                 q = console.input("[bold cyan]GitHub Search Query: [/bold cyan]")
                                 self.items = self.search_github(q); self.state = "SEARCH"; self.sub_index = 0
                                 live.start()
-                            elif "Marketplace" in choice: self.state = "MARKET"; self.items = self.get_marketplace(); self.sub_index = 0
+                            elif "Back" in choice: self.state = "MENU"; self.current_index = 0
+
+                        elif self.state == "SYNC_MENU":
+                            choice = self.sync_options[self.current_index]
+                            if "Sync GitHub Repo" in choice:
+                                live.stop()
+                                repo = console.input("[bold cyan]Repo Name (user/repo): [/bold cyan]")
+                                subprocess.run([sys.executable, "cli.py", "sync", "repo", repo])
+                                console.input("\nPress Enter...")
+                                live.start()
+                            elif "Manage Auth" in choice:
+                                live.stop()
+                                token = console.input("[bold cyan]GitHub Token: [/bold cyan]")
+                                subprocess.run([sys.executable, "cli.py", "vault", "login", token])
+                                console.input("\nPress Enter...")
+                                live.start()
+                            elif "Back" in choice: self.state = "MENU"; self.current_index = 0
+
+                        elif self.state == "FEATURES_MENU":
+                            choice = self.features_options[self.current_index]
+                            if "Workspaces" in choice:
+                                live.stop(); subprocess.run([sys.executable, os.path.join(SCRIPTS_DIR, "morning-routine.py")]); live.start()
+                            elif "Comms Hub" in choice:
+                                live.stop(); subprocess.run([sys.executable, os.path.join(SCRIPTS_DIR, "comms-hub.py")]); live.start()
+                            elif "Quick Explorer" in choice: self.state = "EXPLORER"; self.items = self.get_explorer_items(); self.sub_index = 0
                             elif "Recent Files" in choice: self.state = "RECENT"; self.items = self.get_recent_files(); self.sub_index = 0
-                            elif "Exit" in choice: self.running = False
-                        elif self.state == "SCRIPTS":
+                            elif "Back" in choice: self.state = "MENU"; self.current_index = 0
+
+                        elif self.state == "SCRIPTS_LIST":
                             if self.items: live.stop(); self.run_script(self.items[self.sub_index]); live.start()
                         elif self.state == "EXPLORER":
                             if self.items:
@@ -255,12 +324,18 @@ class ShortcutTUI:
                             if self.items: os.startfile(self.items[self.sub_index]['path']); self.running = False
 
                     elif key == ord('v'): # View Code
-                        if self.state in ["SCRIPTS", "MARKET", "SEARCH"]:
+                        if self.state in ["SCRIPTS_LIST", "MARKET", "SEARCH"]:
                             if self.items: live.stop(); self.view_code(self.items[self.sub_index]); live.start()
 
                     elif key == ord('q') or key == 27:
                         if self.state == "MENU": self.running = False
-                        else: self.state = "MENU"
+                        elif "MENU" in self.state: self.state = "MENU"; self.current_index = 0
+                        else: 
+                             # Return to appropriate submenu
+                             if self.state in ["SCRIPTS_LIST", "MARKET", "SEARCH"]: self.state = "SCRIPTS_MENU"
+                             elif self.state in ["EXPLORER", "RECENT"]: self.state = "FEATURES_MENU"
+                             else: self.state = "MENU"
+                             self.current_index = 0
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
