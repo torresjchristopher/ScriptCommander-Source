@@ -181,7 +181,7 @@ class ShortcutTUI:
         if is_quarantine:
             console.print(Panel("[bold red]SECURITY WARNING[/bold red]\nThis script is unverified.", border_style="red"))
             if not console.input("Type 'run' to proceed: ").lower() == 'run': return
-        console.print(Panel(f"Executing: [bold yellow]{item['name']}[/bold yellow]", border_style="yellow")
+        console.print(Panel(f"Executing: [bold yellow]{item['name']}[/bold yellow]", border_style="yellow"))
         cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-File", script_path] if script_path.endswith(".ps1") else [sys.executable, script_path]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)

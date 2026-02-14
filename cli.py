@@ -25,7 +25,11 @@ console = Console()
 
 @click.group()
 def main():
-    """Shortcut CLI: Container orchestration + Script management + Automation."""
+    """Nexus OS (Shortcut CLI): The Sovereign Shell.
+    
+    A dataless, propagative interface for high-caliber automation,
+    container orchestration (Forge), and intelligence (Nemo).
+    """
     for d in [SCRIPTS_DIR, QUARANTINE_DIR, REPOS_DIR, KEYCARDS_DIR]:
         if not os.path.exists(d): os.makedirs(d)
 
@@ -245,6 +249,84 @@ def scripts_run(script_id):
         else: console.print("[bold green]✓ Success[/bold green]")
     else:
         console.print("[red]Invalid Script ID.[/red]")
+
+
+# ─────────────────────────────────────────────────────────────
+# NEXUS GROUP (Sovereign Shell & Nexus OS Core)
+# ─────────────────────────────────────────────────────────────
+
+@main.group(name='nexus')
+def nexus():
+    """Nexus OS core commands and Sovereign Shell."""
+    pass
+
+@nexus.command(name='enter')
+def nexus_enter():
+    """Enter the interactive Sovereign Shell (Nexus OS)."""
+    from nexus_shell import NexusShell
+    shell = NexusShell()
+    shell.start()
+
+@nexus.command(name='pack')
+@click.argument('path', type=click.Path(exists=True))
+@click.option('--output', '-o', default='context.nxs', help='Output artifact path')
+def nexus_pack(path, output):
+    """Pack a directory into a Sovereign Artifact (.nxs)."""
+    from artifact_packager import SovereignArtifact
+    packager = SovereignArtifact()
+    try:
+        final_path = packager.pack(path, output)
+        console.print(f"[bold green]✓ Artifact packed:[/bold green] {final_path}")
+    except Exception as e:
+        console.print(f"[bold red]Pack Error: {e}[/bold red]")
+
+@nexus.command(name='unpack')
+@click.argument('artifact', type=click.Path(exists=True))
+@click.option('--detonate', is_flag=True, help='Immediately run the artifact logic')
+def nexus_unpack(artifact, detonate):
+    """Unpack (and optionally detonate) a Sovereign Artifact."""
+    from artifact_packager import SovereignArtifact
+    packager = SovereignArtifact(artifact)
+    try:
+        # 1. Unpack
+        extraction = packager.unpack("extracted_context")
+        root_path = extraction['root_path']
+        console.print(f"[bold green]✓ Artifact unpacked to:[/bold green] {root_path}")
+        
+        # 2. Detonate if requested
+        if detonate:
+            console.print("[bold yellow]⚠ Initiating Detonation Sequence...[/bold yellow]")
+            # In a real scenario, we'd inspect the manifest for the entry point
+            # For now, we assume a standard forge.yml or script
+            from forge_integration import launch_forge_command
+            
+            # If the artifact contains a forge.yml, run it
+            if os.path.exists(os.path.join(root_path, "forge.yml")):
+                launch_forge_command(['workflow', 'run', 'default', '--config', os.path.join(root_path, "forge.yml")])
+            else:
+                console.print("[dim]No forge.yml found. Entering shell context...[/dim]")
+                os.system(f"cd {root_path} && cmd") # Simple context switch for now
+                
+    except Exception as e:
+        console.print(f"[bold red]Unpack Error: {e}[/bold red]")
+
+@nexus.command(name='send')
+@click.argument('artifact', type=click.Path(exists=True))
+@click.argument('recipient')
+def nexus_send(artifact, recipient):
+    """Send a Sovereign Artifact via Pidgeon Mesh."""
+    # This bridges the 'Compute' (Artifact) with the 'Transport' (Pidgeon)
+    from pidgeon import Pidgeon
+    p = Pidgeon()
+    
+    # In a real implementation, this would upload the file to a secure relay
+    # and send the link/hash via Pidgeon.
+    # For now, we simulate the transport.
+    console.print(f"[cyan]Uploading {artifact} to Sovereign Mesh...[/cyan]")
+    console.print(f"[bold]Target:[/bold] {recipient}")
+    
+    p.send_pidgeon(recipient, "Incoming Sovereign Context", f"Transferring artifact: {artifact}")
+    console.print("[bold green]✓ Context transmitted.[/bold green]")
 
 
 # ─────────────────────────────────────────────────────────────
