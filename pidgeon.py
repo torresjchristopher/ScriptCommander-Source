@@ -44,8 +44,7 @@ class Pidgeon:
 
     def send_pidgeon(self, to_email, subject, body):
         """
-        Simulate sending an email. In production, this would use 
-        VaultZero to fetch SMTP creds and send via smtplib.
+        Simulate sending an email or context link.
         """
         console.print(f"[cyan]Pidgeon is taking off...[/cyan]")
         console.print(f"[bold]To:[/bold] {to_email}\n[bold]Subject:[/bold] {subject}")
@@ -59,11 +58,28 @@ class Pidgeon:
             "to": to_email,
             "subject": subject,
             "body": body,
-            "timestamp": "now" # In real app, use datetime
+            "timestamp": "now"
         })
         
         with open(self.history_path, 'w') as f:
             json.dump(history, f)
             
         console.print("[green]✓ Pidgeon delivered successfully.[/green]")
+        return True
+
+    def transfer_artifact(self, artifact_path: str, recipient: str):
+        """
+        Simulate the peer-to-peer transfer of a .nxs artifact.
+        """
+        filename = os.path.basename(artifact_path)
+        console.print(f"[bold cyan]MESH[/bold cyan] :: Initiating transfer of {filename} to {recipient}...")
+        
+        # Simulation: Copy to a 'shared' mesh folder
+        mesh_dir = os.path.expanduser("~/.shortcut/mesh_inbox")
+        if not os.path.exists(mesh_dir): os.makedirs(mesh_dir)
+        
+        import shutil
+        shutil.copy(artifact_path, os.path.join(mesh_dir, filename))
+        
+        console.print(f"[green]✓ {filename} available in {recipient}'s mesh inbox.[/green]")
         return True

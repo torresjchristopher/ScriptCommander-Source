@@ -315,15 +315,11 @@ def nexus_unpack(artifact, detonate):
 @click.argument('recipient')
 def nexus_send(artifact, recipient):
     """Send a Sovereign Artifact via Pidgeon Mesh."""
-    # This bridges the 'Compute' (Artifact) with the 'Transport' (Pidgeon)
     from pidgeon import Pidgeon
     p = Pidgeon()
     
-    # In a real implementation, this would upload the file to a secure relay
-    # and send the link/hash via Pidgeon.
-    # For now, we simulate the transport.
-    console.print(f"[cyan]Uploading {artifact} to Sovereign Mesh...[/cyan]")
-    console.print(f"[bold]Target:[/bold] {recipient}")
+    # Use the new transfer logic
+    p.transfer_artifact(artifact, recipient)
     
     p.send_pidgeon(recipient, "Incoming Sovereign Context", f"Transferring artifact: {artifact}")
     console.print("[bold green]✓ Context transmitted.[/bold green]")
