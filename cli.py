@@ -108,6 +108,33 @@ except ImportError:
 
 
 # ─────────────────────────────────────────────────────────────
+# BRIDGE GROUP (Logistics & Orchestration)
+# ─────────────────────────────────────────────────────────────
+
+@main.group(name='bridge')
+def bridge():
+    """Bridge Logistics: Coordinate Forge and Pidgeon workflows."""
+    pass
+
+@bridge.command(name='ship')
+@click.argument('path', type=click.Path(exists=True))
+@click.option('--to', required=True, help='Recipient identifier on Pidgeon Mesh')
+def bridge_ship(path, to):
+    """Ingest, Package, and Transmit a workflow context."""
+    from bridge_engine import BridgeEngine
+    engine = BridgeEngine()
+    engine.ship_workflow(path, to)
+
+@bridge.command(name='receive')
+@click.argument('artifact', type=click.Path(exists=True))
+def bridge_receive(artifact):
+    """Coordinated detonation of a received context."""
+    from bridge_engine import BridgeEngine
+    engine = BridgeEngine()
+    engine.coordinate_detonation(artifact)
+
+
+# ─────────────────────────────────────────────────────────────
 # VAULT GROUP (VaultZero Secret Management)
 # ─────────────────────────────────────────────────────────────
 
