@@ -43,10 +43,19 @@ class SovereignArtifact:
         if metadata:
             meta.update(metadata)
 
-        # 3. Zip it all up into .nxs
-        final_path = output_path if output_path.endswith(".nxs") else f"{output_path}.nxs"
+        # 3. Zip it all up into .nxs (NX- Protocol)
+        import hashlib
+        checksum = hashlib.md5(context_path.encode()).hexdigest()[:3].upper()
+        
+        type_code = "SED"
+        if project_info['runtime'] == "forge_native": type_code = "CTX"
+        if project_info['runtime'] == "docker_compose": type_code = "LGC"
+        
+        coded_name = f"NX-{type_code}-{checksum}-{os.path.basename(context_path)}.nxs"
+        final_path = os.path.join(os.path.dirname(output_path), coded_name)
         
         print(f"[ARTIFACT] Packing context from {context}...")
+        print(f"[NX-CODE] Generated: {coded_name}")
         print(f"[INGEST] Detected {project_info['runtime']}. Pruning heavy artifacts...")
         
         with zipfile.ZipFile(final_path, 'w', zipfile.ZIP_DEFLATED) as nxs:

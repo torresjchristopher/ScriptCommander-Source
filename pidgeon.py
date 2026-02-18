@@ -18,61 +18,52 @@ class Pidgeon:
         self.pidgeon_dir = os.path.expanduser("~/.shortcut/pidgeon")
         self.contacts_path = os.path.join(self.pidgeon_dir, "contacts.json")
         self.history_path = os.path.join(self.pidgeon_dir, "history.json")
+        self.ghost_map_path = os.path.join(self.pidgeon_dir, "ghost_identities.json")
         
         if not os.path.exists(self.pidgeon_dir):
             os.makedirs(self.pidgeon_dir)
         self._init_storage()
 
     def _init_storage(self):
-        for path in [self.contacts_path, self.history_path]:
+        for path in [self.contacts_path, self.history_path, self.ghost_map_path]:
             if not os.path.exists(path):
                 with open(path, 'w') as f:
-                    json.dump([], f)
+                    json.dump({}, f if "ghost" in path else [])
 
-    def get_contacts(self):
-        """Get recent/saved contacts."""
-        with open(self.contacts_path, 'r') as f:
-            return json.load(f)
+    def get_actual_id(self, ghost_name: str) -> str:
+        """Resolves a masked Ghost Name to the real Spectre ID."""
+        with open(self.ghost_map_path, 'r') as f:
+            mapping = json.load(f)
+            return mapping.get(ghost_name, ghost_name) # Fallback to input
 
-    def add_contact(self, name, email):
-        contacts = self.get_contacts()
-        if not any(c['email'] == email for c in contacts):
-            contacts.append({"name": name, "email": email})
-            with open(self.contacts_path, 'w') as f:
-                json.dump(contacts, f)
-        return True
-
-    def send_pidgeon(self, to_email, subject, body):
+    def generate_ghost_name(self, real_id: str) -> str:
         """
-        Simulate sending an email or context link.
+        Creates a unique, illusive name for a specific relationship.
+        In production, this would be derived from a hardware-rooted hash.
         """
-        console.print(f"[cyan]Pidgeon is taking off...[/cyan]")
-        console.print(f"[bold]To:[/bold] {to_email}\n[bold]Subject:[/bold] {subject}")
+        ghosts = ["spectre-alpha", "phantom-node", "void-walker", "nebula-drift", "echo-point"]
+        import random
+        mask = f"{random.choice(ghosts)}-{random.randint(1000, 9999)}"
         
-        # Log to history
-        history = []
-        with open(self.history_path, 'r') as f:
-            history = json.load(f)
-        
-        history.append({
-            "to": to_email,
-            "subject": subject,
-            "body": body,
-            "timestamp": "now"
-        })
-        
-        with open(self.history_path, 'w') as f:
-            json.dump(history, f)
+        # Save the relationship pointer
+        with open(self.ghost_map_path, 'r+') as f:
+            mapping = json.load(f)
+            mapping[mask] = real_id
+            f.seek(0)
+            json.dump(mapping, f, indent=2)
             
-        console.print("[green]✓ Pidgeon delivered successfully.[/green]")
-        return True
+        return mask
 
-    def transfer_artifact(self, artifact_path: str, recipient: str):
+    def transfer_artifact(self, artifact_path: str, recipient_mask: str):
         """
-        Simulate the peer-to-peer transfer of a .nxs artifact.
+        Simulate the peer-to-peer transfer using a Ghost Identity.
         """
+        # Resolve identity internally
+        real_id = self.get_actual_id(recipient_mask)
         filename = os.path.basename(artifact_path)
-        console.print(f"[bold cyan]MESH[/bold cyan] :: Initiating transfer of {filename} to {recipient}...")
+        
+        console.print(f"[bold cyan]MESH[/bold cyan] :: Masked Route Established: [dim]{recipient_mask}[/dim]")
+        console.print(f"[dim][SECURITY] Pidgeon resolving pointer to {real_id}...[/dim]")
         
         # Simulation: Copy to a 'shared' mesh folder
         mesh_dir = os.path.expanduser("~/.shortcut/mesh_inbox")
@@ -81,5 +72,5 @@ class Pidgeon:
         import shutil
         shutil.copy(artifact_path, os.path.join(mesh_dir, filename))
         
-        console.print(f"[green]✓ {filename} available in {recipient}'s mesh inbox.[/green]")
+        console.print(f"[green]✓ {filename} delivered to {recipient_mask}'s secure vault.[/green]")
         return True
